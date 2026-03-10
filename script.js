@@ -36,6 +36,20 @@ document.getElementById("logoutBtn")?.addEventListener("click", () => {
   });
 });
 
+// Cadastro de novos usuários (apenas no painel admin)
+document.getElementById("registerForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const novoEmail = document.getElementById("novoEmail").value;
+  const novaSenha = document.getElementById("novaSenha").value;
+
+  auth.createUserWithEmailAndPassword(novoEmail, novaSenha)
+    .then(() => {
+      alert("Novo usuário cadastrado com sucesso!");
+      document.getElementById("registerForm").reset();
+    })
+    .catch(err => alert("Erro ao cadastrar usuário: " + err.message));
+});
+
 // Cadastro de produtos (salva no Firestore)
 document.getElementById("productForm").addEventListener("submit", function(e) {
   e.preventDefault();
