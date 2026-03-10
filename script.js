@@ -70,11 +70,13 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   if (fotoInput.files.length > 0) {
     const arquivo = fotoInput.files[0];
     const { data, error } = await supabase.storage
-      .from("produtos")
+      .from("PRODUTOS") // bucket em maiúsculo
       .upload(Date.now() + "-" + arquivo.name, arquivo);
 
-    if (!error) {
-      fotoURL = supabase.storage.from("produtos").getPublicUrl(data.path).data.publicUrl;
+    if (error) {
+      mostrarMensagem("productMsg", "Erro ao enviar imagem: " + error.message, "erro");
+    } else if (data) {
+      fotoURL = supabase.storage.from("PRODUTOS").getPublicUrl(data.path).data.publicUrl;
     }
   }
 
@@ -221,4 +223,3 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
 
 // Inicializa o banner ao carregar
 atualizarBanner();
-
