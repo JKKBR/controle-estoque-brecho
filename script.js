@@ -4,6 +4,8 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, si
   from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc } 
   from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } 
+  from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -20,6 +22,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Função para traduzir erros
 function traduzErro(err) {
@@ -41,7 +44,9 @@ function mostrarMensagem(id, texto, tipo="erro") {
   div.textContent = texto;
 }
 
-// Login
+// ----------------------
+// Login / Logout
+// ----------------------
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("usuario").value;
@@ -55,15 +60,16 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   }
 });
 
-// Logout
-document.getElementById("logoutBtn")?.addEventListener("click", async () => {
+document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   document.getElementById("painel").style.display = "none";
   document.getElementById("loginArea").style.display = "block";
   mostrarMensagem("loginMsg", "Você saiu da conta.", "sucesso");
 });
 
-// Cadastro de novos usuários
+// ----------------------
+// Cadastro de usuários
+// ----------------------
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const novoEmail = document.getElementById("novoEmail").value;
@@ -77,7 +83,9 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   }
 });
 
-// Cadastro de produtos
+// ----------------------
+// Cadastro de produtos (com Storage)
+// ----------------------
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const nome = document.getElementById("nome").value;
@@ -87,10 +95,15 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   const qualidade = document.getElementById("qualidade").value;
   const descricao = document.getElementById("descricao").value;
   const fotoInput = document.getElementById("foto");
+
   let fotoURL = "";
   if (fotoInput.files.length > 0) {
-    fotoURL = URL.createObjectURL(fotoInput.files[0]);
+    const arquivo = fotoInput.files[0];
+    const storageRef = ref(storage, "produtos/" + Date.now() + "-" + arquivo.name);
+    await uploadBytes(storageRef, arquivo);
+    fotoURL = await getDownloadURL(storageRef);
   }
+
   try {
     await addDoc(collection(db, "produtos"), { nome, quantidade, estado, preco, qualidade, descricao, fotoURL });
     mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
@@ -100,7 +113,9 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   }
 });
 
+// ----------------------
 // Atualiza tabela administrativa
+// ----------------------
 const tbody = document.querySelector("#productTable tbody");
 onSnapshot(collection(db, "produtos"), (snapshot) => {
   tbody.innerHTML = "";
@@ -117,7 +132,9 @@ onSnapshot(collection(db, "produtos"), (snapshot) => {
   });
 });
 
+// ----------------------
 // Atualiza vitrine pública
+// ----------------------
 const vitrine = document.getElementById("vitrine");
 onSnapshot(collection(db, "produtos"), (snapshot) => {
   vitrine.innerHTML = "";
@@ -136,8 +153,6 @@ onSnapshot(collection(db, "produtos"), (snapshot) => {
 // ----------------------
 // Banner dinâmico
 // ----------------------
-
-// Frases pré-montadas
 const frasesPre = [
   "Confira nossas novidades!",
   "Peças únicas esperando por você!",
@@ -145,7 +160,6 @@ const frasesPre = [
   "Garimpe já sua próxima peça favorita!"
 ];
 
-// Atualiza banner em tempo real
 const bannerDiv = document.getElementById("banner");
 onSnapshot(doc(db, "config", "banner"), (snapshot) => {
   if (snapshot.exists()) {
@@ -153,7 +167,6 @@ onSnapshot(doc(db, "config", "banner"), (snapshot) => {
   }
 });
 
-// Formulário de banner no painel
 document.getElementById("bannerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const selectFrase = document.getElementById("frasePre").value;
@@ -176,7 +189,7 @@ frasesPre.forEach(f => {
   selectFrase.appendChild(opt);
 });
 
-// Exibe a frase atual no painel administrativo em tempo real
+// Exibe frase atual no painel
 const painelBanner = document.getElementById("painelBanner");
 onSnapshot(doc(db, "config", "banner"), (snapshot) => {
   if (snapshot.exists()) {
@@ -185,3 +198,20 @@ onSnapshot(doc(db, "config", "banner"), (snapshot) => {
     painelBanner.textContent = "Nenhuma frase definida ainda.";
   }
 });
+
+// ----------------------
+// Inicialização
+// ----------------------
+// Ao carregar a página, já preenche o select com frases pré-montadas
+const selectFrase = document.getElementById("frasePre");
+frasesPre.forEach(f => {
+  const opt = document.createElement("option");
+  opt.value = f;
+  opt.textContent = f;
+  selectFrase.appendChild(opt);
+});
+
+// Exibe a frase inicial do banner (caso não tenha nada no Firestore)
+if (!bannerDiv.querySelector("h2").textContent) {
+  bannerDiv.querySelector("h2").textContent = frasesPre[0];
+}
