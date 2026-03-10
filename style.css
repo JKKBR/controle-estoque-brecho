@@ -1,140 +1,55 @@
-/* Estilo geral */
-body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background-color: #f5f0e6; /* bege suave, estilo retrô */
-  color: #333;
-}
-
-/* Títulos */
-h1 {
-  color: #6b4226; /* marrom quente */
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-h2, h3 {
-  color: #4a5d23; /* verde musgo */
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-/* Área de login */
-#loginArea {
-  background-color: #fffaf3;
-  border: 1px solid #ccc;
-  padding: 20px;
-  max-width: 300px;
-  margin: 0 auto 20px auto;
-  border-radius: 8px;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-}
-
-#loginForm input, #loginForm button {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
+/* Mensagens de erro e sucesso */
+.mensagem {
+  margin-top: 10px;
   padding: 8px;
   border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-#loginForm button {
-  background-color: #6b4226;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-#loginForm button:hover {
-  background-color: #8c5a3c;
-}
-
-/* Painel administrativo */
-#painel {
-  background-color: #fffaf3;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-}
-
-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-form input, form select, form textarea, form button {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-form button {
-  background-color: #6b4226;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-form button:hover {
-  background-color: #8c5a3c;
-}
-
-/* Tabela administrativa */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  background-color: #fffaf3;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-}
-
-table, th, td {
-  border: 1px solid #ccc;
-}
-
-th {
-  background-color: #d9c2a3; /* tom retrô */
-  color: #333;
-}
-
-th, td {
-  padding: 8px;
+  font-size: 14px;
   text-align: center;
 }
 
-/* Vitrine pública */
+.erro {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.sucesso {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+/* Vitrine pública em grid */
 #vitrine {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  justify-items: center;
+  margin-top: 20px;
 }
 
 .card {
   border: 1px solid #ccc;
-  padding: 10px;
-  width: 200px;
+  padding: 15px;
+  width: 100%;
+  max-width: 250px;
   text-align: center;
   background-color: #fffaf3;
   box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
   border-radius: 8px;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .card:hover {
   transform: scale(1.05);
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.15);
 }
 
 .card img {
   max-width: 100%;
   height: auto;
   border-radius: 4px;
+  margin-bottom: 10px;
 }
 
 .card h3 {
