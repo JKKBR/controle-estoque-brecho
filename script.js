@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
   from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc } 
+import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, deleteDoc, getDoc } 
   from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } 
   from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
@@ -84,10 +84,11 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 });
 
 // ----------------------
-// Cadastro de produtos (com Storage)
+// Cadastro e edição de produtos (com Storage)
 // ----------------------
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const idEdicao = document.getElementById("productForm").getAttribute("data-edit-id");
   const nome = document.getElementById("nome").value;
   const quantidade = document.getElementById("quantidade").value;
   const estado = document.getElementById("estado").value;
@@ -105,8 +106,17 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   }
 
   try {
-    await addDoc(collection(db, "produtos"), { nome, quantidade, estado, preco, qualidade, descricao, fotoURL });
-    mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
+    if (idEdicao) {
+      // Atualiza produto existente
+      const docRef = doc(db, "produtos", idEdicao);
+      await setDoc(docRef, { nome, quantidade, estado, preco, qualidade, descricao, fotoURL }, { merge: true });
+      mostrarMensagem("productMsg", "Produto atualizado com sucesso!", "sucesso");
+      document.getElementById("productForm").removeAttribute("data-edit-id");
+    } else {
+      // Novo produto
+      await addDoc(collection(db, "produtos"), { nome, quantidade, estado, preco, qualidade, descricao, fotoURL });
+      mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
+    }
     document.getElementById("productForm").reset();
   } catch (err) {
     mostrarMensagem("productMsg", "Erro ao salvar produto: " + err.message, "erro");
@@ -114,21 +124,60 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
 });
 
 // ----------------------
-// Atualiza tabela administrativa
+// Relatório Administrativo com Editar/Excluir
 // ----------------------
 const tbody = document.querySelector("#productTable tbody");
 onSnapshot(collection(db, "produtos"), (snapshot) => {
   tbody.innerHTML = "";
-  snapshot.forEach(doc => {
-    const p = doc.data();
+  snapshot.forEach(docSnap => {
+    const p = docSnap.data();
+    const id = docSnap.id;
     const row = `<tr>
       <td>${p.nome}</td>
       <td>${p.quantidade}</td>
       <td>${p.estado}</td>
       <td>R$ ${p.preco}</td>
       <td>${p.qualidade}</td>
+      <td>
+        <button class="editarBtn" data-id="${id}">Editar</button>
+        <button class="excluirBtn" data-id="${id}">Excluir</button>
+      </td>
     </tr>`;
     tbody.innerHTML += row;
+  });
+
+  // Eventos de excluir
+  document.querySelectorAll(".excluirBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-id");
+      try {
+        await deleteDoc(doc(db, "produtos", id));
+        mostrarMensagem("productMsg", "Produto excluído com sucesso!", "sucesso");
+      } catch (err) {
+        mostrarMensagem("productMsg", "Erro ao excluir: " + err.message, "erro");
+      }
+    });
+  });
+
+  // Eventos de editar
+  document.querySelectorAll(".editarBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-id");
+      const docRef = doc(db, "produtos", id);
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        const p = snap.data();
+        // Preenche o formulário com os dados atuais
+        document.getElementById("nome").value = p.nome;
+        document.getElementById("quantidade").value = p.quantidade;
+        document.getElementById("estado").value = p.estado;
+        document.getElementById("preco").value = p.preco;
+        document.getElementById("qualidade").value = p.qualidade;
+        document.getElementById("descricao").value = p.descricao || "";
+        // Marca que estamos editando
+        document.getElementById("productForm").setAttribute("data-edit-id", id);
+      }
+    });
   });
 });
 
@@ -153,6 +202,8 @@ onSnapshot(collection(db, "produtos"), (snapshot) => {
 // ----------------------
 // Banner dinâmico
 // ----------------------
+
+// Frases pré-montadas
 const frasesPre = [
   "Confira nossas novidades!",
   "Peças únicas esperando por você!",
@@ -160,6 +211,7 @@ const frasesPre = [
   "Garimpe já sua próxima peça favorita!"
 ];
 
+// Atualiza banner em tempo real
 const bannerDiv = document.getElementById("banner");
 onSnapshot(doc(db, "config", "banner"), (snapshot) => {
   if (snapshot.exists()) {
@@ -167,6 +219,7 @@ onSnapshot(doc(db, "config", "banner"), (snapshot) => {
   }
 });
 
+// Formulário de banner no painel
 document.getElementById("bannerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const selectFrase = document.getElementById("frasePre").value;
@@ -199,19 +252,24 @@ onSnapshot(doc(db, "config", "banner"), (snapshot) => {
   }
 });
 
-// ----------------------
-// Inicialização
-// ----------------------
-// Ao carregar a página, já preenche o select com frases pré-montadas
-const selectFrase = document.getElementById("frasePre");
-frasesPre.forEach(f => {
-  const opt = document.createElement("option");
-  opt.value = f;
-  opt.textContent = f;
-  selectFrase.appendChild(opt);
-});
-
-// Exibe a frase inicial do banner (caso não tenha nada no Firestore)
+// Define frase inicial caso não haja nada no Firestore
 if (!bannerDiv.querySelector("h2").textContent) {
   bannerDiv.querySelector("h2").textContent = frasesPre[0];
 }
+
+// Define frase inicial caso não haja nada no Firestore
+if (!bannerDiv.querySelector("h2").textContent) {
+  bannerDiv.querySelector("h2").textContent = frasesPre[0];
+}
+
+// ----------------------
+// Fim do script
+// ----------------------
+// Agora o sistema está completo:
+// - Login e logout
+// - Cadastro de usuários
+// - CRUD de produtos (cadastrar, editar, excluir)
+// - Upload de fotos persistente no Firebase Storage
+// - Relatório administrativo com ações
+// - Vitrine pública atualizada em tempo real
+// - Banner dinâmico configurável com frases pré-montadas ou personalizadas
