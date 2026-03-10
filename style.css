@@ -86,6 +86,33 @@ form button:hover {
   background-color: #c49a6c;
 }
 
+/* Botões de ação (Editar/Excluir) */
+.editarBtn {
+  background-color: #4a5d23; /* verde musgo */
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.editarBtn:hover {
+  background-color: #5f7a2e;
+}
+
+.excluirBtn {
+  background-color: #c94c4c; /* vermelho suave */
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.excluirBtn:hover {
+  background-color: #e06666;
+}
+
 /* Tabela administrativa */
 table {
   width: 100%;
@@ -116,6 +143,7 @@ th, td {
   border-radius: 4px;
   font-size: 14px;
   text-align: center;
+  transition: opacity 0.3s ease-in-out; /* suaviza entrada */
 }
 
 .erro {
@@ -144,8 +172,14 @@ th, td {
 
 #banner h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
+  animation: fadeIn 1s ease-in-out; /* animação suave */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Frase atual do banner no painel */
