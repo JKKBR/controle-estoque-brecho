@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Brechó - Controle e Vitrine</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -9,7 +10,7 @@
   <h1>Brechó da Feira</h1>
 
   <!-- Login -->
-  <div id="loginArea">
+  <section id="loginArea">
     <h2>Login Administrativo</h2>
     <form id="loginForm">
       <input type="email" id="usuario" placeholder="Email" required>
@@ -17,10 +18,10 @@
       <button type="submit">Entrar</button>
     </form>
     <div id="loginMsg"></div>
-  </div>
+  </section>
 
   <!-- Painel Administrativo -->
-  <div id="painel" style="display:none;">
+  <section id="painel" style="display:none;">
     <h2>Painel Administrativo</h2>
     <button id="logoutBtn">Sair</button>
 
@@ -81,16 +82,16 @@
     </form>
     <div id="bannerMsg"></div>
     <p id="painelBanner"></p>
-  </div>
+  </section>
 
   <!-- Banner de destaque -->
-  <div id="banner">
+  <section id="banner">
     <h2>Confira nossas novidades!</h2>
-  </div>
+  </section>
 
   <!-- Vitrine Pública -->
   <h2>Vitrine de Produtos</h2>
-  <div id="vitrine"></div>
+  <section id="vitrine"></section>
 
   <!-- Supabase SDK -->
   <script type="module" src="script.js"></script>
