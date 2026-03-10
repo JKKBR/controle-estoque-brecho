@@ -6,6 +6,11 @@ const supabaseUrl = "https://xowcgkvxzcgquxlpkrps.supabase.co";
 const supabaseKey = "sb_publishable_thNdWsDiFhIAPkIygB6xgg_CWDj7mBX"; // anon key
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Configuração do Cloudinary
+const cloudName = "SEU_CLOUD_NAME"; // substitua pelo seu Cloud Name
+const uploadPreset = "brecho_upload"; // preset configurado no painel
+const assetFolder = "samples/ecommerce"; // pasta definida no preset
+
 // Função para mostrar mensagens visuais
 function mostrarMensagem(id, texto, tipo="erro") {
   const div = document.getElementById(id);
@@ -62,16 +67,29 @@ function validarArquivo(arquivo) {
     return { valido: false, msg: "Arquivo muito grande. Máx: 50 MB." };
   }
 
-  const nomeArquivo = Date.now() + "-" + arquivo.name
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove acentos
-    .replace(/\s+/g, "_") // troca espaços por _
-    .replace(/[^a-zA-Z0-9._-]/g, ""); // remove caracteres inválidos
-
-  return { valido: true, nomeArquivo };
+  return { valido: true };
 }
 
 // ----------------------
-// Cadastro e edição de produtos (com Storage)
+// Upload para Cloudinary
+// ----------------------
+async function uploadCloudinary(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", uploadPreset);
+  formData.append("folder", assetFolder);
+
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await response.json();
+  return data.secure_url; // URL pública da imagem
+}
+
+// ----------------------
+// Cadastro e edição de produtos
 // ----------------------
 document.getElementById("productForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -92,17 +110,10 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
     if (!validacao.valido) {
       mostrarMensagem("productMsg", validacao.msg, "erro");
     } else {
-      const { data, error } = await supabase.storage
-        .from("fotos") // bucket único
-        .upload(validacao.nomeArquivo, arquivo, {
-          cacheControl: "3600",
-          upsert: false
-        });
-
-      if (error) {
-        mostrarMensagem("productMsg", "Erro ao enviar imagem: " + error.message, "erro");
-      } else if (data) {
-        fotoURL = supabase.storage.from("fotos").getPublicUrl(data.path).data.publicUrl;
+      try {
+        fotoURL = await uploadCloudinary(arquivo);
+      } catch (err) {
+        mostrarMensagem("productMsg", "Erro ao enviar imagem: " + err.message, "erro");
       }
     }
   }
@@ -248,3 +259,4 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
 
 // Inicializa o banner ao carregar
 atualizarBanner();
+ 
