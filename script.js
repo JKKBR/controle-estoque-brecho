@@ -1,5 +1,20 @@
 let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
 
+// Login simples
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const usuario = document.getElementById("usuario").value;
+  const senha = document.getElementById("senha").value;
+
+  if (usuario === "admin" && senha === "1234") {
+    document.getElementById("loginArea").style.display = "none";
+    document.getElementById("painel").style.display = "block";
+  } else {
+    alert("Usuário ou senha incorretos!");
+  }
+});
+
+// Cadastro de produtos
 document.getElementById("productForm").addEventListener("submit", function(e) {
   e.preventDefault();
   
@@ -56,9 +71,8 @@ function atualizarVitrine() {
 
 function exportCSV() {
   const agora = new Date();
-  const dataHora = agora.toLocaleString("pt-BR"); // formato brasileiro
+  const dataHora = agora.toLocaleString("pt-BR");
 
-  // Cabeçalho com data/hora
   let csv = `Relatório de Produtos - Exportado em ${dataHora}\n`;
   csv += "Nome,Quantidade,Estado,Preço,Qualidade,Descrição\n";
 
@@ -69,8 +83,6 @@ function exportCSV() {
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-
-  // Nome do arquivo com data/hora
   const nomeArquivo = `produtos_${agora.getFullYear()}-${agora.getMonth()+1}-${agora.getDate()}_${agora.getHours()}-${agora.getMinutes()}.csv`;
   a.href = url;
   a.download = nomeArquivo;
@@ -81,7 +93,7 @@ function importCSV(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
   reader.onload = function(e) {
-    const linhas = e.target.result.split("\n").slice(1); // ignora cabeçalho
+    const linhas = e.target.result.split("\n").slice(1);
     linhas.forEach(linha => {
       const [nome, quantidade, estado, preco, qualidade, descricao] = linha.split(",");
       if (nome) {
