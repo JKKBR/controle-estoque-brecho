@@ -5,21 +5,48 @@
   <title>Brechó - Controle e Vitrine</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* Mensagens visuais */
     .mensagem {
       margin-top: 10px;
       padding: 8px;
       border-radius: 4px;
       font-size: 14px;
+      text-align: center;
     }
     .erro {
-      background-color: #f8d7da;
+      background-color: #fcebea;
       color: #721c24;
       border: 1px solid #f5c6cb;
     }
     .sucesso {
-      background-color: #d4edda;
+      background-color: #eaf7ea;
       color: #155724;
       border: 1px solid #c3e6cb;
+    }
+    /* Banner */
+    #banner {
+      background-color: #e6d2b5;
+      color: #a67c52;
+      text-align: center;
+      padding: 15px;
+      margin: 20px auto;
+      border-radius: 8px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+      max-width: 600px;
+    }
+    #banner h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    #painelBanner {
+      margin-top: 10px;
+      padding: 8px;
+      background-color: #fffaf3;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
+      font-style: italic;
     }
   </style>
 </head>
@@ -82,6 +109,23 @@
       </thead>
       <tbody></tbody>
     </table>
+
+    <!-- Configuração do Banner -->
+    <h3>Configuração do Banner</h3>
+    <form id="bannerForm">
+      <label>Escolha uma frase pré-montada:</label>
+      <select id="frasePre"></select>
+      <label>Ou escreva sua própria frase:</label>
+      <input type="text" id="fraseCustom" placeholder="Frase personalizada">
+      <button type="submit">Atualizar Banner</button>
+    </form>
+    <div id="bannerMsg"></div>
+    <p id="painelBanner"></p>
+  </div>
+
+  <!-- Banner de destaque -->
+  <div id="banner">
+    <h2>Confira nossas novidades!</h2>
   </div>
 
   <!-- Vitrine Pública -->
@@ -89,136 +133,6 @@
   <div id="vitrine"></div>
 
   <!-- Firebase SDK modular -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
-      from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot } 
-      from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyC2YRYmavqayWalx2ax9JdGWVIHgAxi1RE",
-      authDomain: "brecho-logistica.firebaseapp.com",
-      projectId: "brecho-logistica",
-      storageBucket: "brecho-logistica.appspot.com", // corrigido
-      messagingSenderId: "673397280509",
-      appId: "1:673397280509:web:058666b2a2be125c30f894",
-      measurementId: "G-ER0MEWN9DY"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    function traduzErro(err) {
-      switch (err.code) {
-        case "auth/invalid-email": return "Formato de email inválido.";
-        case "auth/user-not-found": return "Usuário não encontrado.";
-        case "auth/wrong-password": return "Senha incorreta.";
-        case "auth/email-already-in-use": return "Este email já está em uso.";
-        case "auth/weak-password": return "Senha muito fraca. Use pelo menos 6 caracteres.";
-        case "auth/too-many-requests": return "Muitas tentativas. Aguarde alguns minutos.";
-        default: return "Erro: " + err.message;
-      }
-    }
-
-    function mostrarMensagem(id, texto, tipo="erro") {
-      const div = document.getElementById(id);
-      div.className = "mensagem " + tipo;
-      div.textContent = texto;
-    }
-
-    // Login
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("usuario").value;
-      const senha = document.getElementById("senha").value;
-      try {
-        await signInWithEmailAndPassword(auth, email, senha);
-        document.getElementById("loginArea").style.display = "none";
-        document.getElementById("painel").style.display = "block";
-      } catch (err) {
-        mostrarMensagem("loginMsg", traduzErro(err), "erro");
-      }
-    });
-
-    // Logout
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      await signOut(auth);
-      document.getElementById("painel").style.display = "none";
-      document.getElementById("loginArea").style.display = "block";
-      mostrarMensagem("loginMsg", "Você saiu da conta.", "sucesso");
-    });
-
-    // Cadastro de novos usuários
-    document.getElementById("registerForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const novoEmail = document.getElementById("novoEmail").value;
-      const novaSenha = document.getElementById("novaSenha").value;
-      try {
-        await createUserWithEmailAndPassword(auth, novoEmail, novaSenha);
-        mostrarMensagem("registerMsg", "Novo usuário cadastrado com sucesso!", "sucesso");
-        document.getElementById("registerForm").reset();
-      } catch (err) {
-        mostrarMensagem("registerMsg", traduzErro(err), "erro");
-      }
-    });
-
-    // Cadastro de produtos
-    document.getElementById("productForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const nome = document.getElementById("nome").value;
-      const quantidade = document.getElementById("quantidade").value;
-      const estado = document.getElementById("estado").value;
-      const preco = document.getElementById("preco").value;
-      const qualidade = document.getElementById("qualidade").value;
-      const descricao = document.getElementById("descricao").value;
-      const fotoInput = document.getElementById("foto");
-      let fotoURL = "";
-      if (fotoInput.files.length > 0) {
-        fotoURL = URL.createObjectURL(fotoInput.files[0]);
-      }
-      try {
-        await addDoc(collection(db, "produtos"), { nome, quantidade, estado, preco, qualidade, descricao, fotoURL });
-        mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
-        document.getElementById("productForm").reset();
-      } catch (err) {
-        mostrarMensagem("productMsg", "Erro ao salvar produto: " + err.message, "erro");
-      }
-    });
-
-    // Atualiza tabela administrativa
-    const tbody = document.querySelector("#productTable tbody");
-    onSnapshot(collection(db, "produtos"), (snapshot) => {
-      tbody.innerHTML = "";
-      snapshot.forEach(doc => {
-        const p = doc.data();
-        const row = `<tr>
-          <td>${p.nome}</td>
-          <td>${p.quantidade}</td>
-          <td>${p.estado}</td>
-          <td>R$ ${p.preco}</td>
-          <td>${p.qualidade}</td>
-        </tr>`;
-        tbody.innerHTML += row;
-      });
-    });
-
-       // Atualiza vitrine pública
-    const vitrine = document.getElementById("vitrine");
-    onSnapshot(collection(db, "produtos"), (snapshot) => {
-      vitrine.innerHTML = "";
-      snapshot.forEach(doc => {
-        const p = doc.data();
-        const card = `<div class="card">
-          ${p.fotoURL ? `<img src="${p.fotoURL}" alt="${p.nome}" style="max-width:150px;">` : ""}
-          <h3>${p.nome}</h3>
-          <p><strong>Preço:</strong> R$ ${p.preco}</p>
-          <p>${p.descricao}</p>
-        </div>`;
-        vitrine.innerHTML += card;
-      });
-    });
-  </script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
