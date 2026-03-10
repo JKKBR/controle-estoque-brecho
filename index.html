@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>Brechó - Controle e Vitrine</title>
   <link rel="stylesheet" href="style.css">
+  <!-- SDKs do Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
   <h1>Brechó da Feira</h1>
@@ -12,16 +16,28 @@
   <div id="loginArea">
     <h2>Login Administrativo</h2>
     <form id="loginForm">
-      <input type="text" id="usuario" placeholder="Usuário" required>
+      <input type="email" id="usuario" placeholder="Email" required>
       <input type="password" id="senha" placeholder="Senha" required>
       <button type="submit">Entrar</button>
     </form>
-    <p>Use: usuário <b>admin</b> e senha <b>1234</b></p>
+    <p>Entre com o email e senha cadastrados no Firebase Authentication.</p>
   </div>
 
   <!-- Painel Administrativo (restrito) -->
   <div id="painel" style="display:none;">
     <h2>Painel Administrativo</h2>
+    <button id="logoutBtn">Sair</button>
+
+    <!-- Cadastro de novos usuários -->
+    <h3>Cadastrar Novo Usuário</h3>
+    <form id="registerForm">
+      <input type="email" id="novoEmail" placeholder="Novo Email" required>
+      <input type="password" id="novaSenha" placeholder="Nova Senha" required>
+      <button type="submit">Cadastrar Usuário</button>
+    </form>
+
+    <!-- Cadastro de produtos -->
+    <h3>Cadastrar Produto</h3>
     <form id="productForm">
       <input type="text" id="nome" placeholder="Nome do Produto" required>
       <input type="number" id="quantidade" placeholder="Quantidade" required>
@@ -40,6 +56,7 @@
       <button type="submit">Cadastrar Produto</button>
     </form>
 
+    <!-- Relatório Administrativo -->
     <h3>Relatório Administrativo</h3>
     <table id="productTable">
       <thead>
