@@ -69,14 +69,22 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   let fotoURL = "";
   if (fotoInput.files.length > 0) {
     const arquivo = fotoInput.files[0];
+    // Normaliza o nome do arquivo para evitar erro 400
+    const nomeArquivo = Date.now() + "-" + arquivo.name
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9._-]/g, "");
+
     const { data, error } = await supabase.storage
-      .from("PRODUTOS") // bucket em maiúsculo
-      .upload(Date.now() + "-" + arquivo.name, arquivo);
+      .from("fotos") // novo bucket em minúsculo
+      .upload(nomeArquivo, arquivo, {
+        cacheControl: "3600",
+        upsert: false
+      });
 
     if (error) {
       mostrarMensagem("productMsg", "Erro ao enviar imagem: " + error.message, "erro");
     } else if (data) {
-      fotoURL = supabase.storage.from("PRODUTOS").getPublicUrl(data.path).data.publicUrl;
+      fotoURL = supabase.storage.from("fotos").getPublicUrl(data.path).data.publicUrl;
     }
   }
 
@@ -223,3 +231,4 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
 
 // Inicializa o banner ao carregar
 atualizarBanner();
+
