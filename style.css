@@ -7,22 +7,63 @@ body {
 }
 
 /* Títulos */
-h1, h2 {
+h1 {
   color: #6b4226; /* marrom quente */
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+h2, h3 {
+  color: #4a5d23; /* verde musgo */
   text-align: center;
   margin-bottom: 15px;
 }
 
-/* Formulário */
+/* Área de login */
+#loginArea {
+  background-color: #fffaf3;
+  border: 1px solid #ccc;
+  padding: 20px;
+  max-width: 300px;
+  margin: 0 auto 20px auto;
+  border-radius: 8px;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+}
+
+#loginForm input, #loginForm button {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+#loginForm button {
+  background-color: #6b4226;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#loginForm button:hover {
+  background-color: #8c5a3c;
+}
+
+/* Painel administrativo */
+#painel {
+  background-color: #fffaf3;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+}
+
 form {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 20px;
-  background-color: #fffaf3;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
 }
 
 form input, form select, form textarea, form button {
@@ -67,12 +108,7 @@ th, td {
   text-align: center;
 }
 
-/* Botões de exportação/importação */
-button, input[type="file"] {
-  margin-top: 10px;
-}
-
-/* Vitrine */
+/* Vitrine pública */
 #vitrine {
   display: flex;
   flex-wrap: wrap;
