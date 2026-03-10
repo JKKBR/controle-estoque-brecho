@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
   from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot } 
+import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc } 
   from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
 // Configuração do Firebase
@@ -10,7 +10,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyC2YRYmavqayWalx2ax9JdGWVIHgAxi1RE",
   authDomain: "brecho-logistica.firebaseapp.com",
   projectId: "brecho-logistica",
-  storageBucket: "brecho-logistica.appspot.com", // corrigido
+  storageBucket: "brecho-logistica.appspot.com",
   messagingSenderId: "673397280509",
   appId: "1:673397280509:web:058666b2a2be125c30f894",
   measurementId: "G-ER0MEWN9DY"
@@ -131,4 +131,57 @@ onSnapshot(collection(db, "produtos"), (snapshot) => {
     </div>`;
     vitrine.innerHTML += card;
   });
+});
+
+// ----------------------
+// Banner dinâmico
+// ----------------------
+
+// Frases pré-montadas
+const frasesPre = [
+  "Confira nossas novidades!",
+  "Peças únicas esperando por você!",
+  "Novidades fresquinhas no brechó!",
+  "Garimpe já sua próxima peça favorita!"
+];
+
+// Atualiza banner em tempo real
+const bannerDiv = document.getElementById("banner");
+onSnapshot(doc(db, "config", "banner"), (snapshot) => {
+  if (snapshot.exists()) {
+    bannerDiv.querySelector("h2").textContent = snapshot.data().texto;
+  }
+});
+
+// Formulário de banner no painel
+document.getElementById("bannerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const selectFrase = document.getElementById("frasePre").value;
+  const fraseCustom = document.getElementById("fraseCustom").value.trim();
+  const texto = fraseCustom !== "" ? fraseCustom : selectFrase;
+  try {
+    await setDoc(doc(db, "config", "banner"), { texto });
+    mostrarMensagem("bannerMsg", "Banner atualizado com sucesso!", "sucesso");
+  } catch (err) {
+    mostrarMensagem("bannerMsg", "Erro ao atualizar banner: " + err.message, "erro");
+  }
+});
+
+// Preenche select com frases pré-montadas
+const selectFrase = document.getElementById("frasePre");
+frasesPre.forEach(f => {
+  const opt = document.createElement("option");
+  opt.value = f;
+  opt.textContent = f;
+  selectFrase.appendChild(opt);
+});
+
+// Exibe a frase atual no painel administrativo em tempo real
+const painelBanner = document.getElementById("painelBanner");
+onSnapshot(doc(db, "config", "banner"), (snapshot) => {
+  if (snapshot.exists()) {
+    painelBanner.textContent = "Frase atual do banner: " + snapshot.data().texto;
+  } else {
+    painelBanner.textContent = "Nenhuma frase definida ainda.";
+  }
 });
