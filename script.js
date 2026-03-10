@@ -1,41 +1,10 @@
-// Importações do Firebase SDK modular
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } 
-  from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, deleteDoc, getDoc } 
-  from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } 
-  from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+// Importação do Supabase SDK
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// Configuração do Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyC2YRYmavqayWalx2ax9JdGWVIHgAxi1RE",
-  authDomain: "brecho-logistica.firebaseapp.com",
-  projectId: "brecho-logistica",
-  storageBucket: "brecho-logistica.appspot.com",
-  messagingSenderId: "673397280509",
-  appId: "1:673397280509:web:058666b2a2be125c30f894",
-  measurementId: "G-ER0MEWN9DY"
-};
-
-// Inicializa Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-// Função para traduzir erros
-function traduzErro(err) {
-  switch (err.code) {
-    case "auth/invalid-email": return "Formato de email inválido.";
-    case "auth/user-not-found": return "Usuário não encontrado.";
-    case "auth/wrong-password": return "Senha incorreta.";
-    case "auth/email-already-in-use": return "Este email já está em uso.";
-    case "auth/weak-password": return "Senha muito fraca. Use pelo menos 6 caracteres.";
-    case "auth/too-many-requests": return "Muitas tentativas. Aguarde alguns minutos.";
-    default: return "Erro: " + err.message;
-  }
-}
+// Configuração do Supabase
+const supabaseUrl = "https://xowcgkvxzcgquxlpkrps.supabase.co";
+const supabaseKey = "sb_publishable_thNdWsDiFhIAPkIygB6xgg_CWDj7mBX"; // anon key
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Função para mostrar mensagens visuais
 function mostrarMensagem(id, texto, tipo="erro") {
@@ -51,17 +20,17 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("usuario").value;
   const senha = document.getElementById("senha").value;
-  try {
-    await signInWithEmailAndPassword(auth, email, senha);
+  const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
+  if (error) {
+    mostrarMensagem("loginMsg", "Erro: " + error.message, "erro");
+  } else {
     document.getElementById("loginArea").style.display = "none";
     document.getElementById("painel").style.display = "block";
-  } catch (err) {
-    mostrarMensagem("loginMsg", traduzErro(err), "erro");
   }
 });
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await signOut(auth);
+  await supabase.auth.signOut();
   document.getElementById("painel").style.display = "none";
   document.getElementById("loginArea").style.display = "block";
   mostrarMensagem("loginMsg", "Você saiu da conta.", "sucesso");
@@ -74,12 +43,12 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   e.preventDefault();
   const novoEmail = document.getElementById("novoEmail").value;
   const novaSenha = document.getElementById("novaSenha").value;
-  try {
-    await createUserWithEmailAndPassword(auth, novoEmail, novaSenha);
+  const { error } = await supabase.auth.signUp({ email: novoEmail, password: novaSenha });
+  if (error) {
+    mostrarMensagem("registerMsg", "Erro: " + error.message, "erro");
+  } else {
     mostrarMensagem("registerMsg", "Novo usuário cadastrado com sucesso!", "sucesso");
     document.getElementById("registerForm").reset();
-  } catch (err) {
-    mostrarMensagem("registerMsg", traduzErro(err), "erro");
   }
 });
 
@@ -100,110 +69,110 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   let fotoURL = "";
   if (fotoInput.files.length > 0) {
     const arquivo = fotoInput.files[0];
-    const storageRef = ref(storage, "produtos/" + Date.now() + "-" + arquivo.name);
-    await uploadBytes(storageRef, arquivo);
-    fotoURL = await getDownloadURL(storageRef);
+    const { data, error } = await supabase.storage
+      .from("produtos")
+      .upload(Date.now() + "-" + arquivo.name, arquivo);
+
+    if (!error) {
+      fotoURL = supabase.storage.from("produtos").getPublicUrl(data.path).data.publicUrl;
+    }
   }
 
-  try {
-    if (idEdicao) {
-      // Atualiza produto existente
-      const docRef = doc(db, "produtos", idEdicao);
-      await setDoc(docRef, { nome, quantidade, estado, preco, qualidade, descricao, fotoURL }, { merge: true });
-      mostrarMensagem("productMsg", "Produto atualizado com sucesso!", "sucesso");
-      document.getElementById("productForm").removeAttribute("data-edit-id");
-    } else {
-      // Novo produto
-      await addDoc(collection(db, "produtos"), { nome, quantidade, estado, preco, qualidade, descricao, fotoURL });
-      mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
-    }
-    document.getElementById("productForm").reset();
-  } catch (err) {
-    mostrarMensagem("productMsg", "Erro ao salvar produto: " + err.message, "erro");
+  if (idEdicao) {
+    await supabase.from("produtos").update({
+      nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL
+    }).eq("id", idEdicao);
+    mostrarMensagem("productMsg", "Produto atualizado com sucesso!", "sucesso");
+    document.getElementById("productForm").removeAttribute("data-edit-id");
+  } else {
+    await supabase.from("produtos").insert({
+      nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL
+    });
+    mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
   }
+  document.getElementById("productForm").reset();
+  carregarProdutos();
+  atualizarVitrine();
 });
 
 // ----------------------
 // Relatório Administrativo com Editar/Excluir
 // ----------------------
-const tbody = document.querySelector("#productTable tbody");
-onSnapshot(collection(db, "produtos"), (snapshot) => {
+async function carregarProdutos() {
+  const { data, error } = await supabase.from("produtos").select("*");
+  const tbody = document.querySelector("#productTable tbody");
   tbody.innerHTML = "";
-  snapshot.forEach(docSnap => {
-    const p = docSnap.data();
-    const id = docSnap.id;
-    const row = `<tr>
-      <td>${p.nome}</td>
-      <td>${p.quantidade}</td>
-      <td>${p.estado}</td>
-      <td>R$ ${p.preco}</td>
-      <td>${p.qualidade}</td>
-      <td>
-        <button class="editarBtn" data-id="${id}">Editar</button>
-        <button class="excluirBtn" data-id="${id}">Excluir</button>
-      </td>
-    </tr>`;
-    tbody.innerHTML += row;
-  });
+  if (!error) {
+    data.forEach(p => {
+      const row = `<tr>
+        <td>${p.nome}</td>
+        <td>${p.quantidade}</td>
+        <td>${p.estado}</td>
+        <td>R$ ${p.preco}</td>
+        <td>${p.qualidade}</td>
+        <td>
+          <button class="editarBtn" data-id="${p.id}">Editar</button>
+          <button class="excluirBtn" data-id="${p.id}">Excluir</button>
+        </td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
 
-  // Eventos de excluir
-  document.querySelectorAll(".excluirBtn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const id = btn.getAttribute("data-id");
-      try {
-        await deleteDoc(doc(db, "produtos", id));
+    // Excluir produto
+    document.querySelectorAll(".excluirBtn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-id");
+        await supabase.from("produtos").delete().eq("id", id);
         mostrarMensagem("productMsg", "Produto excluído com sucesso!", "sucesso");
-      } catch (err) {
-        mostrarMensagem("productMsg", "Erro ao excluir: " + err.message, "erro");
-      }
+        carregarProdutos();
+        atualizarVitrine();
+      });
     });
-  });
 
-  // Eventos de editar
-  document.querySelectorAll(".editarBtn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const id = btn.getAttribute("data-id");
-      const docRef = doc(db, "produtos", id);
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        const p = snap.data();
-        // Preenche o formulário com os dados atuais
-        document.getElementById("nome").value = p.nome;
-        document.getElementById("quantidade").value = p.quantidade;
-        document.getElementById("estado").value = p.estado;
-        document.getElementById("preco").value = p.preco;
-        document.getElementById("qualidade").value = p.qualidade;
-        document.getElementById("descricao").value = p.descricao || "";
-        // Marca que estamos editando
-        document.getElementById("productForm").setAttribute("data-edit-id", id);
-      }
+    // Editar produto
+    document.querySelectorAll(".editarBtn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-id");
+        const { data } = await supabase.from("produtos").select("*").eq("id", id).single();
+        if (data) {
+          document.getElementById("nome").value = data.nome;
+          document.getElementById("quantidade").value = data.quantidade;
+          document.getElementById("estado").value = data.estado;
+          document.getElementById("preco").value = data.preco;
+          document.getElementById("qualidade").value = data.qualidade;
+          document.getElementById("descricao").value = data.descricao || "";
+          document.getElementById("productForm").setAttribute("data-edit-id", id);
+        }
+      });
     });
-  });
-});
+  }
+}
+carregarProdutos();
 
 // ----------------------
-// Atualiza vitrine pública
+// Vitrine pública
 // ----------------------
-const vitrine = document.getElementById("vitrine");
-onSnapshot(collection(db, "produtos"), (snapshot) => {
+async function atualizarVitrine() {
+  const { data, error } = await supabase.from("produtos").select("*");
+  const vitrine = document.getElementById("vitrine");
   vitrine.innerHTML = "";
-  snapshot.forEach(doc => {
-    const p = doc.data();
-    const card = `<div class="card">
-      ${p.fotoURL ? `<img src="${p.fotoURL}" alt="${p.nome}">` : ""}
-      <h3>${p.nome}</h3>
-      <p><strong>Preço:</strong> R$ ${p.preco}</p>
-      <p>${p.descricao}</p>
-    </div>`;
-    vitrine.innerHTML += card;
-  });
-});
+  if (!error) {
+    data.forEach(p => {
+      const card = `<div class="card">
+        ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
+        <h3>${p.nome}</h3>
+        <p><strong>Preço:</strong> R$ ${p.preco}</p>
+        <p>${p.descricao}</p>
+      </div>`;
+      vitrine.innerHTML += card;
+    });
+  }
+}
+atualizarVitrine();
 
 // ----------------------
 // Banner dinâmico
 // ----------------------
-
-// Frases pré-montadas
 const frasesPre = [
   "Confira nossas novidades!",
   "Peças únicas esperando por você!",
@@ -211,30 +180,10 @@ const frasesPre = [
   "Garimpe já sua próxima peça favorita!"
 ];
 
-// Atualiza banner em tempo real
 const bannerDiv = document.getElementById("banner");
-onSnapshot(doc(db, "config", "banner"), (snapshot) => {
-  if (snapshot.exists()) {
-    bannerDiv.querySelector("h2").textContent = snapshot.data().texto;
-  }
-});
-
-// Formulário de banner no painel
-document.getElementById("bannerForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const selectFrase = document.getElementById("frasePre").value;
-  const fraseCustom = document.getElementById("fraseCustom").value.trim();
-  const texto = fraseCustom !== "" ? fraseCustom : selectFrase;
-  try {
-    await setDoc(doc(db, "config", "banner"), { texto });
-    mostrarMensagem("bannerMsg", "Banner atualizado com sucesso!", "sucesso");
-  } catch (err) {
-    mostrarMensagem("bannerMsg", "Erro ao atualizar banner: " + err.message, "erro");
-  }
-});
-
-// Preenche select com frases pré-montadas
 const selectFrase = document.getElementById("frasePre");
+
+// Preenche o select com frases pré-montadas
 frasesPre.forEach(f => {
   const opt = document.createElement("option");
   opt.value = f;
@@ -242,34 +191,33 @@ frasesPre.forEach(f => {
   selectFrase.appendChild(opt);
 });
 
-// Exibe frase atual no painel
-const painelBanner = document.getElementById("painelBanner");
-onSnapshot(doc(db, "config", "banner"), (snapshot) => {
-  if (snapshot.exists()) {
-    painelBanner.textContent = "Frase atual do banner: " + snapshot.data().texto;
+// Atualiza o banner no painel e na vitrine
+async function atualizarBanner() {
+  const { data, error } = await supabase.from("config").select("*").eq("id", 1).single();
+  if (!error && data) {
+    bannerDiv.querySelector("h2").textContent = data.texto;
+    document.getElementById("painelBanner").textContent = "Frase atual do banner: " + data.texto;
   } else {
-    painelBanner.textContent = "Nenhuma frase definida ainda.";
+    bannerDiv.querySelector("h2").textContent = frasesPre[0];
+    document.getElementById("painelBanner").textContent = "Nenhuma frase definida ainda.";
+  }
+}
+
+// Formulário para atualizar o banner
+document.getElementById("bannerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const selectFrase = document.getElementById("frasePre").value;
+  const fraseCustom = document.getElementById("fraseCustom").value.trim();
+  const texto = fraseCustom !== "" ? fraseCustom : selectFrase;
+
+  const { error } = await supabase.from("config").upsert({ id: 1, texto });
+  if (error) {
+    mostrarMensagem("bannerMsg", "Erro ao atualizar banner: " + error.message, "erro");
+  } else {
+    mostrarMensagem("bannerMsg", "Banner atualizado com sucesso!", "sucesso");
+    atualizarBanner();
   }
 });
 
-// Define frase inicial caso não haja nada no Firestore
-if (!bannerDiv.querySelector("h2").textContent) {
-  bannerDiv.querySelector("h2").textContent = frasesPre[0];
-}
-
-// Define frase inicial caso não haja nada no Firestore
-if (!bannerDiv.querySelector("h2").textContent) {
-  bannerDiv.querySelector("h2").textContent = frasesPre[0];
-}
-
-// ----------------------
-// Fim do script
-// ----------------------
-// Agora o sistema está completo:
-// - Login e logout
-// - Cadastro de usuários
-// - CRUD de produtos (cadastrar, editar, excluir)
-// - Upload de fotos persistente no Firebase Storage
-// - Relatório administrativo com ações
-// - Vitrine pública atualizada em tempo real
-// - Banner dinâmico configurável com frases pré-montadas ou personalizadas
+// Inicializa o banner ao carregar
+atualizarBanner();
