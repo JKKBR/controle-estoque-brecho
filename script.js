@@ -25,7 +25,26 @@ document.getElementById("loginForm").addEventListener("submit", function(e) {
       document.getElementById("loginArea").style.display = "none";
       document.getElementById("painel").style.display = "block";
     })
-    .catch(err => alert("Erro: " + err.message));
+    .catch(err => {
+      let mensagem = "";
+      switch (err.code) {
+        case "auth/invalid-email":
+          mensagem = "Formato de email inválido.";
+          break;
+        case "auth/user-not-found":
+          mensagem = "Usuário não encontrado. Verifique o email digitado.";
+          break;
+        case "auth/wrong-password":
+          mensagem = "Senha incorreta. Tente novamente.";
+          break;
+        case "auth/too-many-requests":
+          mensagem = "Muitas tentativas. Aguarde alguns minutos.";
+          break;
+        default:
+          mensagem = "Erro ao entrar: " + err.message;
+      }
+      alert(mensagem);
+    });
 });
 
 // Logout
@@ -47,7 +66,23 @@ document.getElementById("registerForm").addEventListener("submit", function(e) {
       alert("Novo usuário cadastrado com sucesso!");
       document.getElementById("registerForm").reset();
     })
-    .catch(err => alert("Erro ao cadastrar usuário: " + err.message));
+    .catch(err => {
+      let mensagem = "";
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          mensagem = "Este email já está em uso.";
+          break;
+        case "auth/invalid-email":
+          mensagem = "Formato de email inválido.";
+          break;
+        case "auth/weak-password":
+          mensagem = "Senha muito fraca. Use pelo menos 6 caracteres.";
+          break;
+        default:
+          mensagem = "Erro ao cadastrar usuário: " + err.message;
+      }
+      alert(mensagem);
+    });
 });
 
 // Cadastro de produtos (salva no Firestore)
