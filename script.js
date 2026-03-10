@@ -55,15 +55,25 @@ function atualizarVitrine() {
 }
 
 function exportCSV() {
-  let csv = "Nome,Quantidade,Estado,Preço,Qualidade,Descrição\n";
+  const agora = new Date();
+  const dataHora = agora.toLocaleString("pt-BR"); // formato brasileiro
+
+  // Cabeçalho com data/hora
+  let csv = `Relatório de Produtos - Exportado em ${dataHora}\n`;
+  csv += "Nome,Quantidade,Estado,Preço,Qualidade,Descrição\n";
+
   produtos.forEach(p => {
     csv += `${p.nome},${p.quantidade},${p.estado},${p.preco},${p.qualidade},${p.descricao}\n`;
   });
+
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
+
+  // Nome do arquivo com data/hora
+  const nomeArquivo = `produtos_${agora.getFullYear()}-${agora.getMonth()+1}-${agora.getDate()}_${agora.getHours()}-${agora.getMinutes()}.csv`;
   a.href = url;
-  a.download = "produtos.csv";
+  a.download = nomeArquivo;
   a.click();
 }
 
@@ -71,7 +81,7 @@ function importCSV(event) {
   const file = event.target.files[0];
   const reader = new FileReader();
   reader.onload = function(e) {
-    const linhas = e.target.result.split("\n").slice(1);
+    const linhas = e.target.result.split("\n").slice(1); // ignora cabeçalho
     linhas.forEach(linha => {
       const [nome, quantidade, estado, preco, qualidade, descricao] = linha.split(",");
       if (nome) {
