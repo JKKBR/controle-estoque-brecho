@@ -53,6 +53,24 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 });
 
 // ----------------------
+// Função de validação de arquivo
+// ----------------------
+function validarArquivo(arquivo) {
+  if (!arquivo) return { valido: false, msg: "Nenhum arquivo selecionado." };
+
+  if (arquivo.size > 50 * 1024 * 1024) {
+    return { valido: false, msg: "Arquivo muito grande. Máx: 50 MB." };
+  }
+
+  const nomeArquivo = Date.now() + "-" + arquivo.name
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove acentos
+    .replace(/\s+/g, "_") // troca espaços por _
+    .replace(/[^a-zA-Z0-9._-]/g, ""); // remove caracteres inválidos
+
+  return { valido: true, nomeArquivo };
+}
+
+// ----------------------
 // Cadastro e edição de produtos (com Storage)
 // ----------------------
 document.getElementById("productForm").addEventListener("submit", async (e) => {
@@ -69,22 +87,23 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   let fotoURL = "";
   if (fotoInput.files.length > 0) {
     const arquivo = fotoInput.files[0];
-    // Normaliza o nome do arquivo para evitar erro 400
-    const nomeArquivo = Date.now() + "-" + arquivo.name
-      .replace(/\s+/g, "_")
-      .replace(/[^a-zA-Z0-9._-]/g, "");
+    const validacao = validarArquivo(arquivo);
 
-    const { data, error } = await supabase.storage
-      .from("fotos") // novo bucket em minúsculo
-      .upload(nomeArquivo, arquivo, {
-        cacheControl: "3600",
-        upsert: false
-      });
+    if (!validacao.valido) {
+      mostrarMensagem("productMsg", validacao.msg, "erro");
+    } else {
+      const { data, error } = await supabase.storage
+        .from("fotos") // bucket único
+        .upload(validacao.nomeArquivo, arquivo, {
+          cacheControl: "3600",
+          upsert: false
+        });
 
-    if (error) {
-      mostrarMensagem("productMsg", "Erro ao enviar imagem: " + error.message, "erro");
-    } else if (data) {
-      fotoURL = supabase.storage.from("fotos").getPublicUrl(data.path).data.publicUrl;
+      if (error) {
+        mostrarMensagem("productMsg", "Erro ao enviar imagem: " + error.message, "erro");
+      } else if (data) {
+        fotoURL = supabase.storage.from("fotos").getPublicUrl(data.path).data.publicUrl;
+      }
     }
   }
 
@@ -128,7 +147,6 @@ async function carregarProdutos() {
       tbody.innerHTML += row;
     });
 
-    // Excluir produto
     document.querySelectorAll(".excluirBtn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.getAttribute("data-id");
@@ -139,7 +157,6 @@ async function carregarProdutos() {
       });
     });
 
-    // Editar produto
     document.querySelectorAll(".editarBtn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.getAttribute("data-id");
@@ -231,4 +248,3 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
 
 // Inicializa o banner ao carregar
 atualizarBanner();
-
