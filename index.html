@@ -2,42 +2,58 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Controle de Estoque - Brechó</title>
+  <title>Brechó - Controle e Vitrine</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Cadastro de Produtos - Brechó</h1>
+  <h1>Brechó da Feira</h1>
 
-  <form id="productForm">
-    <input type="text" id="nome" placeholder="Nome do Produto" required>
-    <input type="number" id="quantidade" placeholder="Quantidade" required>
-    <select id="estado">
-      <option value="Novo">Novo</option>
-      <option value="SemiNovo">SemiNovo</option>
-    </select>
-    <input type="number" id="preco" placeholder="Preço (R$)" required>
-    <select id="qualidade">
-      <option value="Normal">Normal</option>
-      <option value="Avariado">Avariado</option>
-      <option value="Quebrado">Quebrado</option>
-    </select>
-    <input type="file" id="foto" accept="image/*">
-    <textarea id="descricao" placeholder="Descrição"></textarea>
-    <button type="submit">Cadastrar Produto</button>
-  </form>
+  <!-- Login -->
+  <div id="loginArea">
+    <h2>Login Administrativo</h2>
+    <form id="loginForm">
+      <input type="text" id="usuario" placeholder="Usuário" required>
+      <input type="password" id="senha" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <p>Use: usuário <b>admin</b> e senha <b>1234</b></p>
+  </div>
 
-  <h2>Relatório Administrativo</h2>
-  <table id="productTable">
-    <thead>
-      <tr>
-        <th>Nome</th><th>Qtd</th><th>Estado</th><th>Preço</th><th>Qualidade</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <button onclick="exportCSV()">Exportar CSV</button>
-  <input type="file" id="importFile" onchange="importCSV(event)">
+  <!-- Painel Administrativo (restrito) -->
+  <div id="painel" style="display:none;">
+    <h2>Painel Administrativo</h2>
+    <form id="productForm">
+      <input type="text" id="nome" placeholder="Nome do Produto" required>
+      <input type="number" id="quantidade" placeholder="Quantidade" required>
+      <select id="estado">
+        <option value="Novo">Novo</option>
+        <option value="SemiNovo">SemiNovo</option>
+      </select>
+      <input type="number" id="preco" placeholder="Preço (R$)" required>
+      <select id="qualidade">
+        <option value="Normal">Normal</option>
+        <option value="Avariado">Avariado</option>
+        <option value="Quebrado">Quebrado</option>
+      </select>
+      <input type="file" id="foto" accept="image/*">
+      <textarea id="descricao" placeholder="Descrição"></textarea>
+      <button type="submit">Cadastrar Produto</button>
+    </form>
 
+    <h3>Relatório Administrativo</h3>
+    <table id="productTable">
+      <thead>
+        <tr>
+          <th>Nome</th><th>Qtd</th><th>Estado</th><th>Preço</th><th>Qualidade</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button onclick="exportCSV()">Exportar CSV</button>
+    <input type="file" id="importFile" onchange="importCSV(event)">
+  </div>
+
+  <!-- Vitrine Pública -->
   <h2>Vitrine de Produtos</h2>
   <div id="vitrine"></div>
 
