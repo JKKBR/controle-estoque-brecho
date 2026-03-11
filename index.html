@@ -83,23 +83,22 @@
   <!-- Título da Vitrine -->
   <h2 class="vitrine-titulo">Vitrine de Produtos</h2>
 
-  <!-- Menu de Filtros -->
-  <div id="filtros" style="text-align:center; margin:20px 0;">
-    <input type="number" id="precoMax" placeholder="Preço máximo">
-    <select id="estadoFiltro">
-      <option value="">Todos</option>
-      <option value="novo">Novo</option>
-      <option value="seminovo">Seminovo</option>
-      <option value="usado">Usado</option>
-    </select>
-    <select id="qualidadeFiltro">
-      <option value="">Todas</option>
-      <option value="normal">Normal</option>
-      <option value="avariado">Avariado</option>
-      <option value="quebrado">Quebrado</option>
-    </select>
-    <button id="aplicarFiltros">Filtrar</button>
-  </div>
+<!-- Menu de Filtros Centralizado -->
+<div id="filtros">
+  <select id="estadoFiltro">
+    <option value="">Todos</option>
+    <option value="novo">Novo</option>
+    <option value="seminovo">Seminovo</option>
+    <option value="usado">Usado</option>
+  </select>
+  <select id="qualidadeFiltro">
+    <option value="">Todas</option>
+    <option value="normal">Normal</option>
+    <option value="avariado">Avariado</option>
+    <option value="quebrado">Quebrado</option>
+  </select>
+  <button id="aplicarFiltros">Filtrar</button>
+</div>
 
   <!-- Vitrine de Produtos -->
   <div id="vitrine"></div>
@@ -113,3 +112,4 @@
   <script type="module" src="script.js"></script>
 </body>
 </html>
+
