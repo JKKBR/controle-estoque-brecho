@@ -94,25 +94,13 @@ button:hover { background: #8b5e3c; }
 #banner h2 { margin: 5px 0 0; font-size: 1.4em; }
 
 /* ============================
-   Contato
-   ============================ */
-#contato {
-  background: #f5f0e6;
-  border: 2px solid #6b4226;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 30px auto;
-  text-align: center;
-  max-width: 700px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-#contato p { margin: 10px 0; font-size: 1em; color: #4a2c16; }
-#contato p:first-child { font-weight: bold; color: #25D366; font-size: 1.2em; }
-#contato p:nth-child(2) { font-style: italic; color: #6b4226; font-size: 1.05em; }
-
-/* ============================
    Vitrine
    ============================ */
+.vitrine-titulo {
+  text-align: center;
+  margin-top: 20px;
+  color: #6b4226;
+}
 #vitrine {
   display: flex;
   flex-wrap: wrap;
@@ -144,31 +132,7 @@ button:hover { background: #8b5e3c; }
 }
 .card h3 { margin: 10px 0 5px; color: #4a2c16; }
 .card p { margin: 5px 0; color: #4a2c16; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; }
-
-/* Status Reservado/Vendido */
 .card span { display: block; margin-bottom: 5px; }
-
-/* ============================
-   Título da vitrine
-   ============================ */
-.vitrine-titulo {
-  text-align: center;
-  margin-top: 20px;
-  color: #6b4226;
-}
-
-/* ============================
-   Links
-   ============================ */
-a {
-  color: #6b4226;
-  text-decoration: none;
-  transition: color 0.2s ease, text-decoration 0.2s ease;
-}
-a:hover {
-  text-decoration: underline;
-  color: #8b5e3c;
-}
 
 /* ============================
    Bloco de contato discreto
@@ -185,9 +149,7 @@ a:hover {
   color: #4a2c16;
   opacity: 0.85;
 }
-#contato-discreto p {
-  margin: 5px 0;
-}
+#contato-discreto p { margin: 5px 0; }
 #contato-discreto p:first-child {
   font-weight: bold;
   color: #25D366;
@@ -196,9 +158,6 @@ a:hover {
   font-style: italic;
   color: #6b4226;
 }
-
-
-
 
 /* ============================
    Área de filtros
@@ -213,7 +172,6 @@ a:hover {
   text-align: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
-
 #filtros select, #filtros button {
   margin: 5px;
   padding: 8px;
@@ -221,23 +179,34 @@ a:hover {
   border-radius: 4px;
   border: 1px solid #6b4226;
 }
-
 #filtros button {
   background: #6b4226;
   color: #fff;
   border: none;
   cursor: pointer;
 }
-
 #filtros button:hover {
   background: #8b5e3c;
+}
+
+/* ============================
+   Links
+   ============================ */
+a {
+  color: #6b4226;
+  text-decoration: none;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+a:hover {
+  text-decoration: underline;
+  color: #8b5e3c;
 }
 
 /* ============================
    Responsividade
    ============================ */
 @media (max-width: 768px) {
-  #loginArea, #painel, #contato, #filtros {
+  #loginArea, #painel, #contato-discreto, #filtros {
     width: 90%;
     margin: 20px auto;
   }
@@ -249,5 +218,3 @@ a:hover {
     font-size: 0.9em;
   }
 }
-
-
