@@ -2,98 +2,101 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brechó - Controle e Vitrine</title>
+  <title>Brechó da Lucy</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Brechó da Feira</h1>
+  <!-- Banner -->
+  <div id="banner">
+    <h2>Confira nossas novidades!</h2>
+  </div>
 
-  <!-- Login -->
-  <section id="loginArea">
-    <h2>Login Administrativo</h2>
+  <!-- Área de Login -->
+  <div id="loginArea">
+    <h2>Login</h2>
     <form id="loginForm">
       <input type="email" id="usuario" placeholder="Email" required>
       <input type="password" id="senha" placeholder="Senha" required>
       <button type="submit">Entrar</button>
     </form>
     <div id="loginMsg"></div>
-  </section>
+
+    <!-- Botão para abrir cadastro de usuário -->
+    <button id="toggleRegister">Cadastrar Usuário</button>
+    <form id="registerForm" style="display:none;">
+      <input type="email" id="novoEmail" placeholder="Novo Email" required>
+      <input type="password" id="novaSenha" placeholder="Nova Senha" required>
+      <button type="submit">Cadastrar</button>
+    </form>
+    <div id="registerMsg"></div>
+  </div>
 
   <!-- Painel Administrativo -->
-  <section id="painel" style="display:none;">
+  <div id="painel" style="display:none;">
     <h2>Painel Administrativo</h2>
     <button id="logoutBtn">Sair</button>
 
-    <!-- Cadastro de novos usuários -->
-    <h3>Cadastrar Novo Usuário</h3>
-    <form id="registerForm">
-      <input type="email" id="novoEmail" placeholder="Novo Email" required>
-      <input type="password" id="novaSenha" placeholder="Nova Senha" required>
-      <button type="submit">Cadastrar Usuário</button>
-    </form>
-    <div id="registerMsg"></div>
-
-    <!-- Cadastro de produtos -->
+    <!-- Cadastro de Produtos -->
     <h3>Cadastrar Produto</h3>
     <form id="productForm">
-      <input type="text" id="nome" placeholder="Nome do Produto" required>
+      <input type="text" id="nome" placeholder="Nome" required>
       <input type="number" id="quantidade" placeholder="Quantidade" required>
       <select id="estado">
-        <option value="Novo">Novo</option>
-        <option value="SemiNovo">SemiNovo</option>
+        <option value="seminovo" selected>Seminovo</option>
+        <option value="novo">Novo</option>
+        <option value="usado">Usado</option>
       </select>
-      <input type="number" id="preco" placeholder="Preço (R$)" required>
+      <input type="number" id="preco" placeholder="Preço" required>
       <select id="qualidade">
-        <option value="Normal">Normal</option>
-        <option value="Avariado">Avariado</option>
-        <option value="Quebrado">Quebrado</option>
+        <option value="alta">Alta</option>
+        <option value="boa">Boa</option>
+        <option value="regular">Regular</option>
       </select>
-      <input type="file" id="foto" accept="image/*">
       <textarea id="descricao" placeholder="Descrição"></textarea>
-      <button type="submit">Cadastrar Produto</button>
+      <input type="file" id="foto" accept="image/*">
+      <button type="submit">Salvar Produto</button>
     </form>
+    <p style="color:red">Ao editar o produto, a foto deve ser enviada novamente.</p>
     <div id="productMsg"></div>
 
-    <!-- Relatório Administrativo -->
-    <h3>Relatório Administrativo</h3>
+    <!-- Relatório de Produtos -->
+    <h3>Relatório de Produtos</h3>
     <table id="productTable">
       <thead>
         <tr>
+          <th>Card</th>
           <th>Nome</th>
           <th>Qtd</th>
           <th>Estado</th>
           <th>Preço</th>
           <th>Qualidade</th>
+          <th>Atualizado em</th>
           <th>Ações</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
 
-    <!-- Configuração do Banner -->
+    <!-- Banner -->
     <h3>Configuração do Banner</h3>
     <form id="bannerForm">
-      <label>Escolha uma frase pré-montada:</label>
       <select id="frasePre"></select>
-      <label>Ou escreva sua própria frase:</label>
       <input type="text" id="fraseCustom" placeholder="Frase personalizada">
       <button type="submit">Atualizar Banner</button>
     </form>
     <div id="bannerMsg"></div>
-    <p id="painelBanner"></p>
-  </section>
-
-  <!-- Banner de destaque -->
-  <section id="banner">
-    <h2>Confira nossas novidades!</h2>
-  </section>
+    <div id="painelBanner"></div>
+  </div>
 
   <!-- Vitrine Pública -->
   <h2>Vitrine de Produtos</h2>
-  <section id="vitrine"></section>
+  <p><a href="https://wa.me/5521981520719" target="_blank">WhatsApp: (21) 98152-0719</a></p>
+  <div id="vitrine"></div>
+  <p style="color:blue; margin-top:20px">
+    Caso tenha interesse em algum produto, anote o número do card e entre em contato comigo pelo WhatsApp acima.
+  </p>
 
-  <!-- Supabase SDK -->
+  <!-- Script principal -->
   <script type="module" src="script.js"></script>
 </body>
 </html>
