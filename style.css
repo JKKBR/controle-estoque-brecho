@@ -171,6 +171,36 @@ a:hover {
 }
 
 /* ============================
+   Bloco de contato discreto
+   ============================ */
+#contato-discreto {
+  background: #fff;
+  border: 1px dashed #6b4226;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 15px auto;
+  text-align: center;
+  max-width: 600px;
+  font-size: 0.95em;
+  color: #4a2c16;
+  opacity: 0.85;
+}
+#contato-discreto p {
+  margin: 5px 0;
+}
+#contato-discreto p:first-child {
+  font-weight: bold;
+  color: #25D366;
+}
+#contato-discreto p:nth-child(2) {
+  font-style: italic;
+  color: #6b4226;
+}
+
+
+
+
+/* ============================
    Área de filtros
    ============================ */
 #filtros {
@@ -219,4 +249,5 @@ a:hover {
     font-size: 0.9em;
   }
 }
+
 
