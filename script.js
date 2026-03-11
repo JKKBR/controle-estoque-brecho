@@ -31,8 +31,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   } else {
     document.getElementById("loginArea").style.display = "none";
     document.getElementById("painel").style.display = "block";
-    carregarProdutos();   // garante tabela
-    atualizarBanner();    // garante frase do banner
+    carregarProdutos();
+    atualizarBanner();
   }
 });
 
@@ -44,7 +44,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 });
 
 // ----------------------
-// Upload para Cloudinary (salva URL e public_id)
+// Upload para Cloudinary
 // ----------------------
 async function uploadCloudinary(file) {
   const formData = new FormData();
@@ -58,7 +58,7 @@ async function uploadCloudinary(file) {
   });
 
   const data = await response.json();
-  return { url: data.secure_url, public_id: data.public_id };
+  return { url: data.secure_url };
 }
 
 // ----------------------
@@ -76,14 +76,12 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   const fotoInput = document.getElementById("foto");
 
   let fotoURL = "";
-  let fotoPublicId = "";
 
   if (fotoInput.files.length > 0) {
     const arquivo = fotoInput.files[0];
     try {
       const fotoData = await uploadCloudinary(arquivo);
       fotoURL = fotoData.url;
-      fotoPublicId = fotoData.public_id;
     } catch (err) {
       mostrarMensagem("productMsg", "Erro ao enviar imagem: " + err.message, "erro");
     }
@@ -92,7 +90,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   if (idEdicao) {
     await supabase.from("produtos").update({
       nome, quantidade, estado, preco, qualidade, descricao,
-      foto_url: fotoURL, foto_id: fotoPublicId,
+      foto_url: fotoURL,
       updated_at: new Date().toISOString()
     }).eq("id", idEdicao);
     mostrarMensagem("productMsg", "Produto atualizado com sucesso!", "sucesso");
@@ -100,7 +98,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   } else {
     await supabase.from("produtos").insert({
       nome, quantidade, estado, preco, qualidade, descricao,
-      foto_url: fotoURL, foto_id: fotoPublicId,
+      foto_url: fotoURL || null,
       reservado: false, vendido: false,
       updated_at: new Date().toISOString()
     });
@@ -140,18 +138,11 @@ async function carregarProdutos() {
       contador++;
     });
 
-    // Excluir produto + foto
+    // Excluir produto
     document.querySelectorAll(".excluirBtn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.getAttribute("data-id");
-        const { data } = await supabase.from("produtos").select("*").eq("id", id).single();
         await supabase.from("produtos").delete().eq("id", id);
-        if (data.foto_id) {
-          await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/delete_by_token`, {
-            method: "POST",
-            body: JSON.stringify({ public_id: data.foto_id })
-          });
-        }
         mostrarMensagem("productMsg", "Produto excluído com sucesso!", "sucesso");
         carregarProdutos();
         atualizarVitrine();
@@ -188,7 +179,7 @@ async function carregarProdutos() {
       });
     });
 
-       // Vendido / Liberar
+    // Vendido / Liberar
     document.querySelectorAll(".vendidoBtn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.getAttribute("data-id");
@@ -205,13 +196,12 @@ async function carregarProdutos() {
 carregarProdutos();
 
 // ----------------------
-// Vitrine Pública + Filtros + Favoritos
+// Vitrine Pública + Filtros
 // ----------------------
 async function atualizarVitrine() {
   const { data, error } = await supabase.from("produtos").select("*");
   if (!error) {
     renderizarVitrine(data);
-    document.getElementById("favoritosArea").style.display = "none";
     document.getElementById("vitrine").style.display = "flex";
   }
 }
@@ -229,7 +219,6 @@ function renderizarVitrine(data) {
       <h3>${p.nome}</h3>
       <p><strong>Preço:</strong> R$ ${p.preco}</p>
       <p>${p.descricao || ""}</p>
-      <button onclick="adicionarFavorito(${p.id})">❤️ Favorito</button>
     </div>`;
     vitrine.innerHTML += card;
     contador++;
@@ -252,59 +241,8 @@ document.getElementById("aplicarFiltros").addEventListener("click", async () => 
   const { data, error } = await query;
   if (!error) {
     renderizarVitrine(data);
-    document.getElementById("favoritosArea").style.display = "none";
     document.getElementById("vitrine").style.display = "flex";
   }
-});
-
-// ----------------------
-// Favoritos
-// ----------------------
-function adicionarFavorito(idProduto) {
-  let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
-  if (!favoritos.includes(idProduto)) {
-    favoritos.push(idProduto);
-    localStorage.setItem("favoritos", JSON.stringify(favoritos));
-    alert("Produto adicionado aos favoritos!");
-  }
-}
-
-function mostrarFavoritos() {
-  let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
-  if (favoritos.length === 0) {
-    alert("Nenhum produto favorito ainda.");
-    return;
-  }
-  supabase.from("produtos").select("*").in("id", favoritos).then(({ data, error }) => {
-    if (!error) {
-      const favDiv = document.getElementById("favoritosVitrine");
-      favDiv.innerHTML = "";
-      let contador = 1;
-      data.forEach(p => {
-        const card = `<div class="card">
-          <span class="card-numero">Card ${contador}</span>
-          ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
-          <h3>${p.nome}</h3>
-          <p><strong>Preço:</strong> R$ ${p.preco}</p>
-          <p>${p.descricao || ""}</p>
-        </div>`;
-        favDiv.innerHTML += card;
-        contador++;
-      });
-      document.getElementById("favoritosArea").style.display = "block";
-      document.getElementById("vitrine").style.display = "none";
-    }
-  });
-}
-
-document.getElementById("favoritosBtn").addEventListener("click", () => {
-  mostrarFavoritos();
-});
-
-document.getElementById("todosBtn").addEventListener("click", () => {
-  document.getElementById("favoritosArea").style.display = "none";
-  document.getElementById("vitrine").style.display = "flex";
-  atualizarVitrine();
 });
 
 // ----------------------
@@ -353,6 +291,8 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
   }
 });
 
-// Inicializa vitrine e banner
+// ----------------------
+// Inicialização
+// ----------------------
 atualizarVitrine();
 atualizarBanner();
