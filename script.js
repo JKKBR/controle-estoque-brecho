@@ -218,6 +218,7 @@ function renderizarVitrine(data) {
       ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
       <h3>${p.nome}</h3>
       <p><strong>Preço:</strong> R$ ${p.preco}</p>
+      <p><strong>Estado:</strong> ${p.estado}</p>
       <p><strong>Qualidade:</strong> ${p.qualidade}</p>
       <p>${p.descricao || ""}</p>
     </div>`;
@@ -295,4 +296,5 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
 // ----------------------
 atualizarVitrine();
 atualizarBanner();
+
 
