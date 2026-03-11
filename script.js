@@ -42,18 +42,7 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 });
 
 // ----------------------
-// Função de validação de arquivo
-// ----------------------
-function validarArquivo(arquivo) {
-  if (!arquivo) return { valido: false, msg: "Nenhum arquivo selecionado." };
-  if (arquivo.size > 50 * 1024 * 1024) {
-    return { valido: false, msg: "Arquivo muito grande. Máx: 50 MB." };
-  }
-  return { valido: true };
-}
-
-// ----------------------
-// Upload para Cloudinary
+// Upload para Cloudinary (salva URL e public_id)
 // ----------------------
 async function uploadCloudinary(file) {
   const formData = new FormData();
@@ -67,7 +56,7 @@ async function uploadCloudinary(file) {
   });
 
   const data = await response.json();
-  return data.secure_url;
+  return { url: data.secure_url, public_id: data.public_id };
 }
 
 // ----------------------
@@ -85,33 +74,32 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   const fotoInput = document.getElementById("foto");
 
   let fotoURL = "";
+  let fotoPublicId = "";
+
   if (fotoInput.files.length > 0) {
     const arquivo = fotoInput.files[0];
-    const validacao = validarArquivo(arquivo);
-
-    if (!validacao.valido) {
-      mostrarMensagem("productMsg", validacao.msg, "erro");
-    } else {
-      try {
-        fotoURL = await uploadCloudinary(arquivo);
-      } catch (err) {
-        mostrarMensagem("productMsg", "Erro ao enviar imagem: " + err.message, "erro");
-      }
+    try {
+      const fotoData = await uploadCloudinary(arquivo);
+      fotoURL = fotoData.url;
+      fotoPublicId = fotoData.public_id;
+    } catch (err) {
+      mostrarMensagem("productMsg", "Erro ao enviar imagem: " + err.message, "erro");
     }
   }
 
   if (idEdicao) {
     await supabase.from("produtos").update({
-      nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL,
+      nome, quantidade, estado, preco, qualidade, descricao,
+      foto_url: fotoURL, foto_id: fotoPublicId,
       updated_at: new Date().toISOString()
     }).eq("id", idEdicao);
     mostrarMensagem("productMsg", "Produto atualizado com sucesso!", "sucesso");
     document.getElementById("productForm").removeAttribute("data-edit-id");
   } else {
     await supabase.from("produtos").insert({
-      nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL,
-      reservado: false,
-      vendido: false,
+      nome, quantidade, estado, preco, qualidade, descricao,
+      foto_url: fotoURL, foto_id: fotoPublicId,
+      reservado: false, vendido: false,
       updated_at: new Date().toISOString()
     });
     mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
@@ -150,11 +138,18 @@ async function carregarProdutos() {
       contador++;
     });
 
-    // Excluir
+    // Excluir produto + foto
     document.querySelectorAll(".excluirBtn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.getAttribute("data-id");
+        const { data } = await supabase.from("produtos").select("*").eq("id", id).single();
         await supabase.from("produtos").delete().eq("id", id);
+        if (data.foto_id) {
+          await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/delete_by_token`, {
+            method: "POST",
+            body: JSON.stringify({ public_id: data.foto_id })
+          });
+        }
         mostrarMensagem("productMsg", "Produto excluído com sucesso!", "sucesso");
         carregarProdutos();
         atualizarVitrine();
@@ -208,32 +203,81 @@ async function carregarProdutos() {
 carregarProdutos();
 
 // ----------------------
-// Vitrine Pública
+// Vitrine Pública + Filtros + Favoritos
 // ----------------------
 async function atualizarVitrine() {
   const { data, error } = await supabase.from("produtos").select("*");
-  const vitrine = document.getElementById("vitrine");
-  vitrine.innerHTML = "";
-
   if (!error) {
-    let contador = 1;
-    data.forEach(p => {
-      const card = `<div class="card">
-        <span class="card-numero">Card ${contador}</span>
-        ${p.reservado ? `<span style="color:red; font-weight:bold;">Reservado</span>` : ""}
-        ${p.vendido ? `<span style="color:red; font-weight:bold;">Vendido</span>` : ""}
-        ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
-        <h3>${p.nome}</h3>
-        <p><strong>Preço:</strong> R$ ${p.preco}</p>
-        <p>${p.descricao || ""}</p>
-        ${p.updated_at ? `<p style="color:#6b4226; font-size:12px">Atualizado em: ${new Date(p.updated_at).toLocaleString("pt-BR")}</p>` : ""}
-      </div>`;
-      vitrine.innerHTML += card;
-      contador++;
-    });
+    renderizarVitrine(data);
   }
 }
-atualizarVitrine();
+
+// Função para renderizar a vitrine
+function renderizarVitrine(data) {
+  const vitrine = document.getElementById("vitrine");
+  vitrine.innerHTML = "";
+  let contador = 1;
+  data.forEach(p => {
+    const card = `<div class="card">
+      <span class="card-numero">Card ${contador}</span>
+      ${p.reservado ? `<span style="color:red; font-weight:bold;">Reservado</span>` : ""}
+      ${p.vendido ? `<span style="color:red; font-weight:bold;">Vendido</span>` : ""}
+      ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
+      <h3>${p.nome}</h3>
+      <p><strong>Preço:</strong> R$ ${p.preco}</p>
+      <p>${p.descricao || ""}</p>
+      <button onclick="adicionarFavorito(${p.id})">❤️ Favorito</button>
+    </div>`;
+    vitrine.innerHTML += card;
+    contador++;
+  });
+}
+
+// ----------------------
+// Filtros de produtos
+// ----------------------
+document.getElementById("aplicarFiltros").addEventListener("click", async () => {
+  const precoMax = document.getElementById("precoMax").value;
+  const estado = document.getElementById("estadoFiltro").value;
+  const qualidade = document.getElementById("qualidadeFiltro").value;
+
+  let query = supabase.from("produtos").select("*");
+
+  if (precoMax) query = query.lte("preco", precoMax);
+  if (estado) query = query.eq("estado", estado);
+  if (qualidade) query = query.eq("qualidade", qualidade);
+
+  const { data, error } = await query;
+  if (!error) {
+    renderizarVitrine(data);
+  }
+});
+
+// ----------------------
+// Favoritos via LocalStorage
+// ----------------------
+function adicionarFavorito(idProduto) {
+  let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+  if (!favoritos.includes(idProduto)) {
+    favoritos.push(idProduto);
+    localStorage.setItem("favoritos", JSON.stringify(favoritos));
+    alert("Produto adicionado aos favoritos!");
+  }
+}
+
+// Exibir favoritos
+function mostrarFavoritos() {
+  let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+  if (favoritos.length === 0) {
+    alert("Nenhum produto favorito ainda.");
+    return;
+  }
+  supabase.from("produtos").select("*").in("id", favoritos).then(({ data, error }) => {
+    if (!error) {
+      renderizarVitrine(data);
+    }
+  });
+}
 
 // ----------------------
 // Banner dinâmico
@@ -284,6 +328,6 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
   }
 });
 
-// Inicializa o banner ao carregar
+// Inicializa vitrine e banner ao carregar
+atualizarVitrine();
 atualizarBanner();
- 
