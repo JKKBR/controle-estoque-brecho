@@ -196,7 +196,7 @@ async function carregarProdutos() {
 carregarProdutos();
 
 // ----------------------
-// Vitrine Pública + Filtros
+// Vitrine Pública + Filtros (sem preço)
 // ----------------------
 async function atualizarVitrine() {
   const { data, error } = await supabase.from("produtos").select("*");
@@ -226,15 +226,13 @@ function renderizarVitrine(data) {
 }
 
 // ----------------------
-// Filtros
+// Filtros (apenas estado e qualidade)
 // ----------------------
 document.getElementById("aplicarFiltros").addEventListener("click", async () => {
-  const precoMax = document.getElementById("precoMax").value;
   const estado = document.getElementById("estadoFiltro").value;
   const qualidade = document.getElementById("qualidadeFiltro").value;
 
   let query = supabase.from("produtos").select("*");
-  if (precoMax) query = query.lte("preco", precoMax);
   if (estado) query = query.eq("estado", estado);
   if (qualidade) query = query.eq("qualidade", qualidade);
 
