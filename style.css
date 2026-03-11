@@ -112,6 +112,8 @@ button:hover {
   border: 1px solid #6b4226;
   border-radius: 4px;
   box-sizing: border-box;
+  word-wrap: break-word;     /* força quebra de palavras longas */
+  overflow-wrap: break-word; /* garante quebra em navegadores modernos */
 }
 
 /* ============================
@@ -232,3 +234,4 @@ a:hover {
   text-decoration: underline;
   color: #8b5e3c;
 }
+
