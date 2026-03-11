@@ -209,10 +209,12 @@ async function atualizarVitrine() {
   const { data, error } = await supabase.from("produtos").select("*");
   if (!error) {
     renderizarVitrine(data);
+    document.getElementById("favoritosArea").style.display = "none";
+    document.getElementById("vitrine").style.display = "flex";
   }
 }
 
-// Função para renderizar a vitrine
+// Renderiza a vitrine principal
 function renderizarVitrine(data) {
   const vitrine = document.getElementById("vitrine");
   vitrine.innerHTML = "";
@@ -250,6 +252,8 @@ document.getElementById("aplicarFiltros").addEventListener("click", async () => 
   const { data, error } = await query;
   if (!error) {
     renderizarVitrine(data);
+    document.getElementById("favoritosArea").style.display = "none";
+    document.getElementById("vitrine").style.display = "flex";
   }
 });
 
@@ -265,7 +269,6 @@ function adicionarFavorito(idProduto) {
   }
 }
 
-// Exibir favoritos
 function mostrarFavoritos() {
   let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
   if (favoritos.length === 0) {
@@ -274,10 +277,36 @@ function mostrarFavoritos() {
   }
   supabase.from("produtos").select("*").in("id", favoritos).then(({ data, error }) => {
     if (!error) {
-      renderizarVitrine(data);
+      const favDiv = document.getElementById("favoritosVitrine");
+      favDiv.innerHTML = "";
+      let contador = 1;
+      data.forEach(p => {
+        const card = `<div class="card">
+          <span class="card-numero">Card ${contador}</span>
+          ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
+          <h3>${p.nome}</h3>
+          <p><strong>Preço:</strong> R$ ${p.preco}</p>
+          <p>${p.descricao || ""}</p>
+        </div>`;
+        favDiv.innerHTML += card;
+        contador++;
+      });
+      document.getElementById("favoritosArea").style.display = "block";
+      document.getElementById("vitrine").style.display = "none";
     }
   });
 }
+
+// Botões de alternância
+document.getElementById("favoritosBtn").addEventListener("click", () => {
+  mostrarFavoritos();
+});
+
+document.getElementById("todosBtn").addEventListener("click", () => {
+  document.getElementById("favoritosArea").style.display = "none";
+  document.getElementById("vitrine").style.display = "flex";
+  atualizarVitrine();
+});
 
 // ----------------------
 // Banner dinâmico
