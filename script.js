@@ -7,7 +7,7 @@ const supabaseKey = "sb_publishable_thNdWsDiFhIAPkIygB6xgg_CWDj7mBX"; // anon ke
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Configuração do Cloudinary
-const cloudName = "dcq0mwkdy"; // Cloud Name correto da sua conta
+const cloudName = "dcq0mwkdy"; // Cloud Name correto
 const uploadPreset = "brecho_upload"; // preset configurado no painel
 const assetFolder = "samples/ecommerce"; // pasta definida no preset
 
@@ -17,7 +17,6 @@ function mostrarMensagem(id, texto, tipo="erro") {
   div.className = "mensagem " + tipo;
   div.textContent = texto;
 }
-
 
 // ----------------------
 // Login / Logout
@@ -43,8 +42,13 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 });
 
 // ----------------------
-// Cadastro de usuários
+// Cadastro de usuários (mais discreto)
 // ----------------------
+document.getElementById("toggleRegister").addEventListener("click", () => {
+  const form = document.getElementById("registerForm");
+  form.style.display = form.style.display === "none" ? "block" : "none";
+});
+
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const novoEmail = document.getElementById("novoEmail").value;
@@ -55,6 +59,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   } else {
     mostrarMensagem("registerMsg", "Novo usuário cadastrado com sucesso!", "sucesso");
     document.getElementById("registerForm").reset();
+    document.getElementById("registerForm").style.display = "none";
   }
 });
 
@@ -63,11 +68,9 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 // ----------------------
 function validarArquivo(arquivo) {
   if (!arquivo) return { valido: false, msg: "Nenhum arquivo selecionado." };
-
   if (arquivo.size > 50 * 1024 * 1024) {
     return { valido: false, msg: "Arquivo muito grande. Máx: 50 MB." };
   }
-
   return { valido: true };
 }
 
@@ -97,7 +100,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   const idEdicao = document.getElementById("productForm").getAttribute("data-edit-id");
   const nome = document.getElementById("nome").value;
   const quantidade = document.getElementById("quantidade").value;
-  const estado = document.getElementById("estado").value;
+  const estado = document.getElementById("estado").value; // default Seminovo
   const preco = document.getElementById("preco").value;
   const qualidade = document.getElementById("qualidade").value;
   const descricao = document.getElementById("descricao").value;
@@ -121,13 +124,15 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
 
   if (idEdicao) {
     await supabase.from("produtos").update({
-      nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL
+      nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL,
+      updated_at: new Date().toISOString()
     }).eq("id", idEdicao);
     mostrarMensagem("productMsg", "Produto atualizado com sucesso!", "sucesso");
     document.getElementById("productForm").removeAttribute("data-edit-id");
   } else {
     await supabase.from("produtos").insert({
-      nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL
+      nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL,
+      updated_at: new Date().toISOString()
     });
     mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
   }
@@ -144,19 +149,23 @@ async function carregarProdutos() {
   const tbody = document.querySelector("#productTable tbody");
   tbody.innerHTML = "";
   if (!error) {
+    let contador = 1;
     data.forEach(p => {
       const row = `<tr>
+        <td>Card ${contador}</td>
         <td>${p.nome}</td>
         <td>${p.quantidade}</td>
         <td>${p.estado}</td>
         <td>R$ ${p.preco}</td>
         <td>${p.qualidade}</td>
+        <td>${p.updated_at ? new Date(p.updated_at).toLocaleString("pt-BR") : ""}</td>
         <td>
           <button class="editarBtn" data-id="${p.id}">Editar</button>
           <button class="excluirBtn" data-id="${p.id}">Excluir</button>
         </td>
       </tr>`;
       tbody.innerHTML += row;
+      contador++;
     });
 
     document.querySelectorAll(".excluirBtn").forEach(btn => {
@@ -195,16 +204,26 @@ async function atualizarVitrine() {
   const { data, error } = await supabase.from("produtos").select("*");
   const vitrine = document.getElementById("vitrine");
   vitrine.innerHTML = "";
+
   if (!error) {
+    let contador = 1;
     data.forEach(p => {
       const card = `<div class="card">
+        <span class="card-numero">Card ${contador}</span>
         ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
         <h3>${p.nome}</h3>
         <p><strong>Preço:</strong> R$ ${p.preco}</p>
         <p>${p.descricao}</p>
+        ${p.updated_at ? `<p style="color:red; font-size:12px">Atualizado em: ${new Date(p.updated_at).toLocaleString("pt-BR")}</p>` : ""}
       </div>`;
       vitrine.innerHTML += card;
+      contador++;
     });
+
+    // Mensagem de instrução para o cliente
+    vitrine.innerHTML += `<p style="color:blue; margin-top:20px">
+      Caso tenha interesse em algum produto, anote o número do card e entre em contato comigo pelo WhatsApp abaixo.
+    </p>`;
   }
 }
 atualizarVitrine();
@@ -260,5 +279,3 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
 
 // Inicializa o banner ao carregar
 atualizarBanner();
- 
-
