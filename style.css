@@ -204,6 +204,8 @@ button:hover {
   margin: 5px 0;
   color: #4a2c16;
   font-size: 0.95em;
+  word-wrap: break-word;     /* força quebra de palavras longas */
+  overflow-wrap: break-word; /* garante quebra em navegadores modernos */
 }
 
 /* ============================
@@ -234,4 +236,3 @@ a:hover {
   text-decoration: underline;
   color: #8b5e3c;
 }
-
