@@ -6,7 +6,14 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Área de Login (externa, simplificada) -->
+
+  <!-- Banner -->
+  <div id="banner">
+    <h1>Brechó da Lucy</h1>
+    <h2>Confira nossas novidades!</h2>
+  </div>
+
+  <!-- Área de Login -->
   <div id="loginArea">
     <h2>Login</h2>
     <form id="loginForm">
@@ -14,39 +21,38 @@
       <input type="password" id="senha" placeholder="Senha" required>
       <button type="submit">Entrar</button>
     </form>
-    <div id="loginMsg"></div>
+    <div id="loginMsg" class="mensagem"></div>
   </div>
 
   <!-- Painel Administrativo -->
   <div id="painel" style="display:none;">
-    <h2>Painel Administrativo - Brechó da Lucy</h2>
+    <h2>Painel Administrativo</h2>
     <button id="logoutBtn">Sair</button>
 
-    <!-- Cadastro de Produtos -->
+    <!-- Cadastro de Produto -->
     <h3>Cadastrar Produto</h3>
     <form id="productForm">
       <input type="text" id="nome" placeholder="Nome" required>
       <input type="number" id="quantidade" placeholder="Quantidade" required>
       <select id="estado">
-        <option value="seminovo" selected>Seminovo</option>
         <option value="novo">Novo</option>
+        <option value="seminovo">Seminovo</option>
         <option value="usado">Usado</option>
       </select>
       <input type="number" id="preco" placeholder="Preço" required>
       <select id="qualidade">
-        <option value="normal" selected>Normal</option>
-        <option value="quebrado">Quebrado</option>
+        <option value="normal">Normal</option>
         <option value="avariado">Avariado</option>
+        <option value="quebrado">Quebrado</option>
       </select>
       <textarea id="descricao" placeholder="Descrição"></textarea>
-      <input type="file" id="foto" accept="image/*">
-      <button type="submit">Salvar Produto</button>
+      <input type="file" id="foto">
+      <button type="submit">Salvar</button>
     </form>
-    <p style="color:red">Ao editar o produto, a foto deve ser enviada novamente.</p>
-    <div id="productMsg"></div>
+    <div id="productMsg" class="mensagem"></div>
 
     <!-- Relatório de Produtos -->
-    <h3>Relatório de Produtos</h3>
+    <h3>Produtos Cadastrados</h3>
     <table id="productTable">
       <thead>
         <tr>
@@ -56,41 +62,63 @@
           <th>Estado</th>
           <th>Preço</th>
           <th>Qualidade</th>
-          <th>Atualizado em</th>
+          <th>Atualizado</th>
           <th>Ações</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
 
-    <!-- Banner -->
-    <h3>Configuração do Banner</h3>
+    <!-- Banner Config -->
+    <h3>Configurar Banner</h3>
     <form id="bannerForm">
       <select id="frasePre"></select>
       <input type="text" id="fraseCustom" placeholder="Frase personalizada">
       <button type="submit">Atualizar Banner</button>
     </form>
-    <div id="bannerMsg"></div>
-    <div id="painelBanner"></div>
+    <div id="bannerMsg" class="mensagem"></div>
+    <p id="painelBanner"></p>
   </div>
 
-  <!-- Banner -->
-  <div id="banner">
-    <h1>Brechó da Lucy</h1>
-    <h2>Confira nossas novidades!</h2>
+  <!-- Área Pública -->
+  <h2 class="vitrine-titulo">Vitrine</h2>
+
+  <!-- Filtros e Favoritos -->
+  <div id="filtros">
+    <input type="number" id="precoMax" placeholder="Preço máximo">
+    <select id="estadoFiltro">
+      <option value="">Todos</option>
+      <option value="novo">Novo</option>
+      <option value="seminovo">Seminovo</option>
+      <option value="usado">Usado</option>
+    </select>
+    <select id="qualidadeFiltro">
+      <option value="">Todas</option>
+      <option value="normal">Normal</option>
+      <option value="avariado">Avariado</option>
+      <option value="quebrado">Quebrado</option>
+    </select>
+    <button id="aplicarFiltros">Filtrar</button>
+    <button id="favoritosBtn">❤️ Ver Favoritos</button>
+    <button id="todosBtn">📦 Ver Todos</button>
   </div>
 
-  <!-- Bloco de contato fixo -->
-  <div id="contato">
-    <p><strong>📞 WhatsApp:</strong> <a href="https://wa.me/5521981520719" target="_blank">(21) 98152-0719</a></p>
-    <p>💡 Caso tenha interesse em algum produto, anote o número do card e entre em contato comigo pelo WhatsApp.</p>
-  </div>
-
-  <!-- Vitrine Pública -->
-  <h2 class="vitrine-titulo">Vitrine de Produtos</h2>
+  <!-- Vitrine de Produtos -->
   <div id="vitrine"></div>
 
-  <!-- Script principal -->
+  <!-- Aba de Favoritos -->
+  <h2 class="vitrine-titulo">Meus Favoritos</h2>
+  <div id="favoritosArea" style="display:none;">
+    <div id="favoritosVitrine"></div>
+  </div>
+
+  <!-- Bloco de Contato -->
+  <div id="contato">
+    <p>📞 Telefone: (21) 99999-9999</p>
+    <p>📧 Email: contato@brechodalucy.com</p>
+    <p><a href="#">Instagram</a> | <a href="#">Facebook</a></p>
+  </div>
+
   <script type="module" src="script.js"></script>
 </body>
 </html>
