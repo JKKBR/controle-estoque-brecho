@@ -4,6 +4,33 @@
   <meta charset="UTF-8">
   <title>Brechó da Lucy</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Centralização do login */
+    #loginArea {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 40px;
+    }
+    #loginForm {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 250px;
+    }
+    #loginForm input, #loginForm button {
+      padding: 8px;
+      font-size: 1em;
+    }
+
+    /* Centralização do título da vitrine */
+    h2.vitrine-titulo {
+      text-align: center;
+      color: #6b4226;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
   <!-- Área de Login (externa, simplificada) -->
@@ -21,15 +48,6 @@
   <div id="painel" style="display:none;">
     <h2>Painel Administrativo - Brechó da Lucy</h2>
     <button id="logoutBtn">Sair</button>
-
-    <!-- Cadastro de Usuários (apenas interno) -->
-    <h3>Cadastrar Novo Usuário</h3>
-    <form id="registerForm">
-      <input type="email" id="novoEmail" placeholder="Novo Email" required>
-      <input type="password" id="novaSenha" placeholder="Nova Senha" required>
-      <button type="submit">Cadastrar</button>
-    </form>
-    <div id="registerMsg"></div>
 
     <!-- Cadastro de Produtos -->
     <h3>Cadastrar Produto</h3>
@@ -96,7 +114,7 @@
   </div>
 
   <!-- Vitrine Pública -->
-  <h2>Vitrine de Produtos</h2>
+  <h2 class="vitrine-titulo">Vitrine de Produtos</h2>
   <div id="vitrine"></div>
 
   <!-- Script principal -->
