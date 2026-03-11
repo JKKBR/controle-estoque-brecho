@@ -6,12 +6,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Banner -->
-  <div id="banner">
-    <h2>Confira nossas novidades!</h2>
-  </div>
-
-  <!-- Área de Login -->
+  <!-- Área de Login (externa, simplificada) -->
   <div id="loginArea">
     <h2>Login</h2>
     <form id="loginForm">
@@ -20,21 +15,21 @@
       <button type="submit">Entrar</button>
     </form>
     <div id="loginMsg"></div>
+  </div>
 
-    <!-- Botão para abrir cadastro de usuário -->
-    <button id="toggleRegister">Cadastrar Usuário</button>
-    <form id="registerForm" style="display:none;">
+  <!-- Painel Administrativo -->
+  <div id="painel" style="display:none;">
+    <h2>Painel Administrativo - Brechó da Lucy</h2>
+    <button id="logoutBtn">Sair</button>
+
+    <!-- Cadastro de Usuários (apenas interno) -->
+    <h3>Cadastrar Novo Usuário</h3>
+    <form id="registerForm">
       <input type="email" id="novoEmail" placeholder="Novo Email" required>
       <input type="password" id="novaSenha" placeholder="Nova Senha" required>
       <button type="submit">Cadastrar</button>
     </form>
     <div id="registerMsg"></div>
-  </div>
-
-  <!-- Painel Administrativo -->
-  <div id="painel" style="display:none;">
-    <h2>Painel Administrativo</h2>
-    <button id="logoutBtn">Sair</button>
 
     <!-- Cadastro de Produtos -->
     <h3>Cadastrar Produto</h3>
@@ -48,9 +43,9 @@
       </select>
       <input type="number" id="preco" placeholder="Preço" required>
       <select id="qualidade">
-        <option value="alta">Alta</option>
-        <option value="boa">Boa</option>
-        <option value="regular">Regular</option>
+        <option value="normal" selected>Normal</option>
+        <option value="quebrado">Quebrado</option>
+        <option value="avariado">Avariado</option>
       </select>
       <textarea id="descricao" placeholder="Descrição"></textarea>
       <input type="file" id="foto" accept="image/*">
@@ -88,13 +83,21 @@
     <div id="painelBanner"></div>
   </div>
 
+  <!-- Banner -->
+  <div id="banner">
+    <h1>Brechó da Lucy</h1>
+    <h2>Confira nossas novidades!</h2>
+  </div>
+
+  <!-- Bloco de contato fixo -->
+  <div id="contato">
+    <p><strong>📞 WhatsApp:</strong> <a href="https://wa.me/5521981520719" target="_blank">(21) 98152-0719</a></p>
+    <p>💡 Caso tenha interesse em algum produto, anote o número do card e entre em contato comigo pelo WhatsApp.</p>
+  </div>
+
   <!-- Vitrine Pública -->
   <h2>Vitrine de Produtos</h2>
-  <p><a href="https://wa.me/5521981520719" target="_blank">WhatsApp: (21) 98152-0719</a></p>
   <div id="vitrine"></div>
-  <p style="color:blue; margin-top:20px">
-    Caso tenha interesse em algum produto, anote o número do card e entre em contato comigo pelo WhatsApp acima.
-  </p>
 
   <!-- Script principal -->
   <script type="module" src="script.js"></script>
