@@ -31,6 +31,8 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   } else {
     document.getElementById("loginArea").style.display = "none";
     document.getElementById("painel").style.display = "block";
+    carregarProdutos();   // garante tabela
+    atualizarBanner();    // garante frase do banner
   }
 });
 
@@ -186,7 +188,7 @@ async function carregarProdutos() {
       });
     });
 
-    // Vendido / Liberar
+       // Vendido / Liberar
     document.querySelectorAll(".vendidoBtn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.getAttribute("data-id");
@@ -214,7 +216,6 @@ async function atualizarVitrine() {
   }
 }
 
-// Renderiza a vitrine principal
 function renderizarVitrine(data) {
   const vitrine = document.getElementById("vitrine");
   vitrine.innerHTML = "";
@@ -236,7 +237,7 @@ function renderizarVitrine(data) {
 }
 
 // ----------------------
-// Filtros de produtos
+// Filtros
 // ----------------------
 document.getElementById("aplicarFiltros").addEventListener("click", async () => {
   const precoMax = document.getElementById("precoMax").value;
@@ -244,7 +245,6 @@ document.getElementById("aplicarFiltros").addEventListener("click", async () => 
   const qualidade = document.getElementById("qualidadeFiltro").value;
 
   let query = supabase.from("produtos").select("*");
-
   if (precoMax) query = query.lte("preco", precoMax);
   if (estado) query = query.eq("estado", estado);
   if (qualidade) query = query.eq("qualidade", qualidade);
@@ -258,7 +258,7 @@ document.getElementById("aplicarFiltros").addEventListener("click", async () => 
 });
 
 // ----------------------
-// Favoritos via LocalStorage
+// Favoritos
 // ----------------------
 function adicionarFavorito(idProduto) {
   let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
@@ -297,7 +297,6 @@ function mostrarFavoritos() {
   });
 }
 
-// Botões de alternância
 document.getElementById("favoritosBtn").addEventListener("click", () => {
   mostrarFavoritos();
 });
@@ -321,7 +320,6 @@ const frasesPre = [
 const bannerDiv = document.getElementById("banner");
 const selectFrase = document.getElementById("frasePre");
 
-// Preenche o select com frases pré-montadas
 frasesPre.forEach(f => {
   const opt = document.createElement("option");
   opt.value = f;
@@ -329,7 +327,6 @@ frasesPre.forEach(f => {
   selectFrase.appendChild(opt);
 });
 
-// Atualiza o banner no painel e na vitrine
 async function atualizarBanner() {
   const { data, error } = await supabase.from("config").select("*").eq("id", 1).single();
   if (!error && data) {
@@ -341,7 +338,6 @@ async function atualizarBanner() {
   }
 }
 
-// Formulário para atualizar o banner
 document.getElementById("bannerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const selectFrase = document.getElementById("frasePre").value;
@@ -357,6 +353,6 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
   }
 });
 
-// Inicializa vitrine e banner ao carregar
+// Inicializa vitrine e banner
 atualizarVitrine();
 atualizarBanner();
