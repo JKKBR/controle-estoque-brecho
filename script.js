@@ -42,22 +42,6 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 });
 
 // ----------------------
-// Cadastro de usuários (apenas interno)
-// ----------------------
-document.getElementById("registerForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const novoEmail = document.getElementById("novoEmail").value;
-  const novaSenha = document.getElementById("novaSenha").value;
-  const { error } = await supabase.auth.signUp({ email: novoEmail, password: novaSenha });
-  if (error) {
-    mostrarMensagem("registerMsg", "Erro: " + error.message, "erro");
-  } else {
-    mostrarMensagem("registerMsg", "Novo usuário cadastrado com sucesso!", "sucesso");
-    document.getElementById("registerForm").reset();
-  }
-});
-
-// ----------------------
 // Função de validação de arquivo
 // ----------------------
 function validarArquivo(arquivo) {
