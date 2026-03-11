@@ -141,9 +141,12 @@ button:hover { background: #8b5e3c; }
 }
 .card:hover { transform: scale(1.05); }
 .card img {
-  max-width: 100%;
-  border-radius: 4px;
+  width: 220px;       /* largura fixa */
+  height: 220px;      /* altura fixa */
+  object-fit: cover;  /* corta e ajusta sem distorcer */
+  border-radius: 6px;
   border: 1px solid #6b4226;
+  margin-bottom: 10px;
 }
 .card-numero {
   font-weight: bold;
@@ -239,3 +242,4 @@ a:hover {
     font-size: 0.9em;
   }
 }
+
