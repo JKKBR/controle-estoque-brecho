@@ -21,6 +21,15 @@ body {
 #loginArea h2 {
   color: #6b4226;
 }
+#loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#loginForm input, #loginForm button {
+  padding: 8px;
+  font-size: 1em;
+}
 
 /* Painel interno com marrom retrô */
 #painel {
@@ -161,6 +170,19 @@ button:hover {
   margin: 5px 0;
   color: #4a2c16;
   font-size: 0.95em;
+}
+
+/* Texto Reservado */
+.card span {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Centralização do título da vitrine */
+.vitrine-titulo {
+  text-align: center;
+  margin-top: 20px;
+  color: #6b4226;
 }
 
 /* Links */
