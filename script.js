@@ -111,6 +111,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
     await supabase.from("produtos").insert({
       nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL,
       reservado: false,
+      vendido: false,
       updated_at: new Date().toISOString()
     });
     mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
@@ -142,6 +143,7 @@ async function carregarProdutos() {
           <button class="editarBtn" data-id="${p.id}">Editar</button>
           <button class="excluirBtn" data-id="${p.id}">Excluir</button>
           <button class="reservarBtn" data-id="${p.id}">${p.reservado ? "Liberar" : "Reservar"}</button>
+          <button class="vendidoBtn" data-id="${p.id}">${p.vendido ? "Liberar" : "Vendido"}</button>
         </td>
       </tr>`;
       tbody.innerHTML += row;
@@ -188,6 +190,19 @@ async function carregarProdutos() {
         atualizarVitrine();
       });
     });
+
+    // Vendido / Liberar
+    document.querySelectorAll(".vendidoBtn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-id");
+        const { data } = await supabase.from("produtos").select("vendido").eq("id", id).single();
+        const novoStatus = !data.vendido;
+        await supabase.from("produtos").update({ vendido: novoStatus }).eq("id", id);
+        mostrarMensagem("productMsg", novoStatus ? "Produto marcado como vendido!" : "Produto liberado!", "sucesso");
+        carregarProdutos();
+        atualizarVitrine();
+      });
+    });
   }
 }
 carregarProdutos();
@@ -206,6 +221,7 @@ async function atualizarVitrine() {
       const card = `<div class="card">
         <span class="card-numero">Card ${contador}</span>
         ${p.reservado ? `<span style="color:red; font-weight:bold;">Reservado</span>` : ""}
+        ${p.vendido ? `<span style="color:red; font-weight:bold;">Vendido</span>` : ""}
         ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
         <h3>${p.nome}</h3>
         <p><strong>Preço:</strong> R$ ${p.preco}</p>
@@ -270,3 +286,4 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
 
 // Inicializa o banner ao carregar
 atualizarBanner();
+ 
