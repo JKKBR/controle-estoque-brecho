@@ -126,6 +126,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   } else {
     await supabase.from("produtos").insert({
       nome, quantidade, estado, preco, qualidade, descricao, foto_url: fotoURL,
+      reservado: false,
       updated_at: new Date().toISOString()
     });
     mostrarMensagem("productMsg", "Produto cadastrado com sucesso!", "sucesso");
@@ -156,12 +157,14 @@ async function carregarProdutos() {
         <td>
           <button class="editarBtn" data-id="${p.id}">Editar</button>
           <button class="excluirBtn" data-id="${p.id}">Excluir</button>
+          <button class="reservarBtn" data-id="${p.id}">${p.reservado ? "Liberar" : "Reservar"}</button>
         </td>
       </tr>`;
       tbody.innerHTML += row;
       contador++;
     });
 
+    // Excluir
     document.querySelectorAll(".excluirBtn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.getAttribute("data-id");
@@ -172,6 +175,7 @@ async function carregarProdutos() {
       });
     });
 
+    // Editar
     document.querySelectorAll(".editarBtn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const id = btn.getAttribute("data-id");
@@ -185,6 +189,19 @@ async function carregarProdutos() {
           document.getElementById("descricao").value = data.descricao || "";
           document.getElementById("productForm").setAttribute("data-edit-id", id);
         }
+      });
+    });
+
+    // Reservar / Liberar
+    document.querySelectorAll(".reservarBtn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-id");
+        const { data } = await supabase.from("produtos").select("reservado").eq("id", id).single();
+        const novoStatus = !data.reservado;
+        await supabase.from("produtos").update({ reservado: novoStatus }).eq("id", id);
+        mostrarMensagem("productMsg", novoStatus ? "Produto marcado como reservado!" : "Produto liberado!", "sucesso");
+        carregarProdutos();
+        atualizarVitrine();
       });
     });
   }
@@ -204,6 +221,7 @@ async function atualizarVitrine() {
     data.forEach(p => {
       const card = `<div class="card">
         <span class="card-numero">Card ${contador}</span>
+        ${p.reservado ? `<span style="color:red; font-weight:bold;">Reservado</span>` : ""}
         ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
         <h3>${p.nome}</h3>
         <p><strong>Preço:</strong> R$ ${p.preco}</p>
