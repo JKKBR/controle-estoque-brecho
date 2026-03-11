@@ -13,14 +13,15 @@ body {
    Topo fixo com nome
    ============================ */
 #topo {
-  background: #6b4226;
+  background: #6b4226;   /* faixa marrom */
   color: white;
   text-align: center;
-  padding: 15px;
+  padding: 20px;
 }
 #topo h1 {
   margin: 0;
   font-size: 2em;
+  font-weight: bold;
 }
 
 /* ============================
