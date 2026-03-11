@@ -7,9 +7,9 @@ const supabaseKey = "sb_publishable_thNdWsDiFhIAPkIygB6xgg_CWDj7mBX"; // anon ke
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Configuração do Cloudinary
-const cloudName = "dcq0mwkdy"; // Cloud Name correto
-const uploadPreset = "brecho_upload"; // preset configurado no painel
-const assetFolder = "samples/ecommerce"; // pasta definida no preset
+const cloudName = "dcq0mwkdy";
+const uploadPreset = "brecho_upload";
+const assetFolder = "samples/ecommerce";
 
 // Função para mostrar mensagens visuais
 function mostrarMensagem(id, texto, tipo="erro") {
@@ -42,13 +42,8 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
 });
 
 // ----------------------
-// Cadastro de usuários (mais discreto)
+// Cadastro de usuários (apenas interno)
 // ----------------------
-document.getElementById("toggleRegister").addEventListener("click", () => {
-  const form = document.getElementById("registerForm");
-  form.style.display = form.style.display === "none" ? "block" : "none";
-});
-
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const novoEmail = document.getElementById("novoEmail").value;
@@ -59,7 +54,6 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   } else {
     mostrarMensagem("registerMsg", "Novo usuário cadastrado com sucesso!", "sucesso");
     document.getElementById("registerForm").reset();
-    document.getElementById("registerForm").style.display = "none";
   }
 });
 
@@ -89,7 +83,7 @@ async function uploadCloudinary(file) {
   });
 
   const data = await response.json();
-  return data.secure_url; // URL pública da imagem
+  return data.secure_url;
 }
 
 // ----------------------
@@ -100,7 +94,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
   const idEdicao = document.getElementById("productForm").getAttribute("data-edit-id");
   const nome = document.getElementById("nome").value;
   const quantidade = document.getElementById("quantidade").value;
-  const estado = document.getElementById("estado").value; // default Seminovo
+  const estado = document.getElementById("estado").value;
   const preco = document.getElementById("preco").value;
   const qualidade = document.getElementById("qualidade").value;
   const descricao = document.getElementById("descricao").value;
@@ -142,7 +136,7 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
 });
 
 // ----------------------
-// Relatório Administrativo com Editar/Excluir
+// Relatório Administrativo
 // ----------------------
 async function carregarProdutos() {
   const { data, error } = await supabase.from("produtos").select("*");
@@ -198,7 +192,7 @@ async function carregarProdutos() {
 carregarProdutos();
 
 // ----------------------
-// Vitrine pública
+// Vitrine Pública
 // ----------------------
 async function atualizarVitrine() {
   const { data, error } = await supabase.from("produtos").select("*");
@@ -213,17 +207,12 @@ async function atualizarVitrine() {
         ${p.foto_url ? `<img src="${p.foto_url}" alt="${p.nome}">` : ""}
         <h3>${p.nome}</h3>
         <p><strong>Preço:</strong> R$ ${p.preco}</p>
-        <p>${p.descricao}</p>
-        ${p.updated_at ? `<p style="color:red; font-size:12px">Atualizado em: ${new Date(p.updated_at).toLocaleString("pt-BR")}</p>` : ""}
+        <p>${p.descricao || ""}</p>
+        ${p.updated_at ? `<p style="color:#6b4226; font-size:12px">Atualizado em: ${new Date(p.updated_at).toLocaleString("pt-BR")}</p>` : ""}
       </div>`;
       vitrine.innerHTML += card;
       contador++;
     });
-
-    // Mensagem de instrução para o cliente
-    vitrine.innerHTML += `<p style="color:blue; margin-top:20px">
-      Caso tenha interesse em algum produto, anote o número do card e entre em contato comigo pelo WhatsApp abaixo.
-    </p>`;
   }
 }
 atualizarVitrine();
