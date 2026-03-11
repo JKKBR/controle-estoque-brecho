@@ -10,11 +10,11 @@ body {
 }
 
 /* ============================
-   Login externo simplificado
+   Login
    ============================ */
 #loginArea {
   background: #fff;
-  border: 2px solid #6b4226; /* marrom escuro */
+  border: 2px solid #6b4226;
   border-radius: 8px;
   padding: 20px;
   margin: 40px auto;
@@ -22,32 +22,21 @@ body {
   text-align: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
-#loginArea h2 {
-  color: #6b4226;
-}
-#loginForm {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-#loginForm input, #loginForm button {
-  padding: 8px;
-  font-size: 1em;
-}
+#loginArea h2 { color: #6b4226; }
+#loginForm { display: flex; flex-direction: column; gap: 10px; }
+#loginForm input, #loginForm button { padding: 8px; font-size: 1em; }
 
 /* ============================
    Painel administrativo
    ============================ */
 #painel {
-  background: #f5f0e6; /* bege claro */
+  background: #f5f0e6;
   border: 2px solid #6b4226;
   border-radius: 8px;
   padding: 20px;
   margin: 20px;
 }
-#painel h2, #painel h3 {
-  color: #6b4226;
-}
+#painel h2, #painel h3 { color: #6b4226; }
 
 /* ============================
    Botões
@@ -60,64 +49,40 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
-button:hover {
-  background: #8b5e3c;
-}
+button:hover { background: #8b5e3c; }
 
 /* ============================
-   Mensagens de feedback
+   Mensagens
    ============================ */
-.mensagem {
-  margin-top: 10px;
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 0.9em;
-}
-.mensagem.erro {
-  background: #ffe5e5;
-  color: #d8000c;
-}
-.mensagem.sucesso {
-  background: #e5ffe5;
-  color: #4f8a10;
-}
+.mensagem { margin-top: 10px; padding: 8px; border-radius: 4px; font-size: 0.9em; }
+.mensagem.erro { background: #ffe5e5; color: #d8000c; }
+.mensagem.sucesso { background: #e5ffe5; color: #4f8a10; }
 
 /* ============================
-   Tabela administrativa
+   Tabela
    ============================ */
-#productTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-#productTable th, #productTable td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-}
-#productTable th {
-  background: #6b4226;
-  color: white;
-}
+#productTable { width: 100%; border-collapse: collapse; margin-top: 15px; }
+#productTable th, #productTable td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+#productTable th { background: #6b4226; color: white; }
 
 /* ============================
-   Campo de descrição maior
+   Campo descrição
    ============================ */
 #descricao {
   width: 100%;
-  min-height: 120px;   /* altura maior para digitar */
-  resize: vertical;    /* permite redimensionar apenas na vertical */
+  min-height: 120px;
+  resize: vertical;
   padding: 8px;
   font-size: 1em;
   border: 1px solid #6b4226;
   border-radius: 4px;
   box-sizing: border-box;
-  word-wrap: break-word;     /* força quebra de palavras longas */
-  overflow-wrap: break-word; /* garante quebra em navegadores modernos */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ============================
-   Banner principal
+   Banner
    ============================ */
 #banner {
   background: #6b4226;
@@ -125,21 +90,15 @@ button:hover {
   text-align: center;
   padding: 20px;
 }
-#banner h1 {
-  margin: 0;
-  font-size: 2em;
-}
-#banner h2 {
-  margin: 5px 0 0;
-  font-size: 1.4em;
-}
+#banner h1 { margin: 0; font-size: 2em; }
+#banner h2 { margin: 5px 0 0; font-size: 1.4em; }
 
 /* ============================
-   Bloco de contato
+   Contato
    ============================ */
 #contato {
-  background: #f5f0e6;              /* fundo bege */
-  border: 2px solid #6b4226;        /* borda marrom escuro */
+  background: #f5f0e6;
+  border: 2px solid #6b4226;
   border-radius: 8px;
   padding: 20px;
   margin: 30px auto;
@@ -147,29 +106,12 @@ button:hover {
   max-width: 700px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
+#contato p { margin: 10px 0; font-size: 1em; color: #4a2c16; }
+#contato p:first-child { font-weight: bold; color: #25D366; font-size: 1.2em; }
+#contato p:nth-child(2) { font-style: italic; color: #6b4226; font-size: 1.05em; }
 
-/* Texto geral do bloco */
-#contato p {
-  margin: 10px 0;
-  font-size: 1em;
-  color: #4a2c16;
-}
-
-/* Destaque para WhatsApp */
-#contato p:first-child {
-  font-weight: bold;
-  color: #25D366;                   /* verde WhatsApp */
-  font-size: 1.2em;
-}
-
-/* Destaque para instrução */
-#contato p:nth-child(2) {
-  font-style: italic;
-  color: #6b4226;
-  font-size: 1.05em;
-}
 /* ============================
-   Vitrine de produtos
+   Vitrine
    ============================ */
 #vitrine {
   display: flex;
@@ -188,9 +130,7 @@ button:hover {
   text-align: center;
   transition: transform 0.2s ease;
 }
-.card:hover {
-  transform: scale(1.05);
-}
+.card:hover { transform: scale(1.05); }
 .card img {
   max-width: 100%;
   border-radius: 4px;
@@ -202,25 +142,11 @@ button:hover {
   display: block;
   margin-bottom: 5px;
 }
-.card h3 {
-  margin: 10px 0 5px;
-  color: #4a2c16;
-}
-.card p {
-  margin: 5px 0;
-  color: #4a2c16;
-  font-size: 0.95em;
-  word-wrap: break-word;     /* força quebra de palavras longas */
-  overflow-wrap: break-word; /* garante quebra em navegadores modernos */
-}
+.card h3 { margin: 10px 0 5px; color: #4a2c16; }
+.card p { margin: 5px 0; color: #4a2c16; font-size: 0.95em; word-wrap: break-word; overflow-wrap: break-word; }
 
-/* ============================
-   Texto de status (Reservado / Vendido)
-   ============================ */
-.card span {
-  display: block;
-  margin-bottom: 5px;
-}
+/* Status Reservado/Vendido */
+.card span { display: block; margin-bottom: 5px; }
 
 /* ============================
    Título da vitrine
@@ -232,14 +158,60 @@ button:hover {
 }
 
 /* ============================
-   Links gerais
+   Links
    ============================ */
 a {
   color: #6b4226;
   text-decoration: none;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
 }
 a:hover {
   text-decoration: underline;
   color: #8b5e3c;
 }
 
+/* ============================
+   Área de filtros
+   ============================ */
+#filtros {
+  background: #fff;
+  border: 2px solid #6b4226;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 20px auto;
+  max-width: 700px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+#filtros input, #filtros select, #filtros button {
+  margin: 5px;
+  padding: 8px;
+  font-size: 1em;
+  border-radius: 4px;
+  border: 1px solid #6b4226;
+}
+#filtros button {
+  background: #6b4226;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+#filtros button:hover {
+  background: #8b5e3c;
+}
+
+/* ============================
+   Responsividade
+   ============================ */
+@media (max-width: 768px) {
+  #loginArea, #painel, #contato, #filtros {
+    width: 90%;
+    margin: 20px auto;
+  }
+  .card {
+    width: 100%;
+    max-width: 300px;
+  }
+  #productTable {
+    font-size: 0.9em;
+  }
+}
