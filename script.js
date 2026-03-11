@@ -7,7 +7,7 @@ const supabaseKey = "sb_publishable_thNdWsDiFhIAPkIygB6xgg_CWDj7mBX"; // anon ke
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Configuração do Cloudinary
-const cloudName = "SEU_CLOUD_NAME"; // substitua pelo seu Cloud Name
+const cloudName = "dcq0mwkdy"; // Cloud Name correto da sua conta
 const uploadPreset = "brecho_upload"; // preset configurado no painel
 const assetFolder = "samples/ecommerce"; // pasta definida no preset
 
@@ -17,6 +17,7 @@ function mostrarMensagem(id, texto, tipo="erro") {
   div.className = "mensagem " + tipo;
   div.textContent = texto;
 }
+
 
 // ----------------------
 // Login / Logout
@@ -260,3 +261,4 @@ document.getElementById("bannerForm").addEventListener("submit", async (e) => {
 // Inicializa o banner ao carregar
 atualizarBanner();
  
+
