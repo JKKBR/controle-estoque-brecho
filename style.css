@@ -92,18 +92,11 @@ button:hover { background: #8b5e3c; }
 .mensagem.sucesso { background: #e5ffe5; color: #4f8a10; }
 
 /* ============================
-   Tabela de Produtos
+   Tabela
    ============================ */
 #productTable { width: 100%; border-collapse: collapse; margin-top: 15px; }
 #productTable th, #productTable td { border: 1px solid #ddd; padding: 8px; text-align: center; }
 #productTable th { background: #6b4226; color: white; }
-
-/* ============================
-   Tabela de Movimentação
-   ============================ */
-#movimentacaoTable { width: 100%; border-collapse: collapse; margin-top: 15px; }
-#movimentacaoTable th, #movimentacaoTable td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-#movimentacaoTable th { background: #8b5e3c; color: white; }
 
 /* ============================
    Campo descrição
@@ -148,9 +141,9 @@ button:hover { background: #8b5e3c; }
 }
 .card:hover { transform: scale(1.05); }
 .card img {
-  width: 220px;
-  height: 220px;
-  object-fit: cover;
+  width: 220px;       /* largura fixa */
+  height: 220px;      /* altura fixa */
+  object-fit: cover;  /* corta e ajusta sem distorcer */
   border-radius: 6px;
   border: 1px solid #6b4226;
   margin-bottom: 10px;
@@ -181,8 +174,14 @@ button:hover { background: #8b5e3c; }
   opacity: 0.85;
 }
 #contato-discreto p { margin: 5px 0; }
-#contato-discreto p:first-child { font-weight: bold; color: #25D366; }
-#contato-discreto p:nth-child(2) { font-style: italic; color: #6b4226; }
+#contato-discreto p:first-child {
+  font-weight: bold;
+  color: #25D366;
+}
+#contato-discreto p:nth-child(2) {
+  font-style: italic;
+  color: #6b4226;
+}
 
 /* ============================
    Área de filtros
@@ -210,37 +209,21 @@ button:hover { background: #8b5e3c; }
   border: none;
   cursor: pointer;
 }
-#filtros button:hover { background: #8b5e3c; }
-
-/* ============================
-   Abas do painel
-   ============================ */
-.tabs { margin-bottom: 15px; }
-.tablink {
-  background: #6b4226;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  border-radius: 4px 4px 0 0;
-  margin-right: 5px;
-}
-.tablink.active { background: #8b5e3c; }
-.tabcontent {
-  border: 2px solid #6b4226;
-  border-radius: 0 8px 8px 8px;
-  padding: 15px;
-  background: #f5f0e6;
+#filtros button:hover {
+  background: #8b5e3c;
 }
 
 /* ============================
-   Gráficos
+   Links
    ============================ */
-canvas {
-  margin-top: 15px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+a {
+  color: #6b4226;
+  text-decoration: none;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+a:hover {
+  text-decoration: underline;
+  color: #8b5e3c;
 }
 
 /* ============================
@@ -255,7 +238,7 @@ canvas {
     width: 100%;
     max-width: 300px;
   }
-  #productTable, #movimentacaoTable {
+  #productTable {
     font-size: 0.9em;
   }
 }
