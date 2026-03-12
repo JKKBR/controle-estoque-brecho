@@ -2,11 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Painel Administrativo - Brechó</title>
+  <title>Brechó da Lucy</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
+<!-- Nome fixo no topo -->
+<header id="topo">
+  <h1>Brechó da Lucy</h1>
+</header>
+
 
   <!-- Área de Login -->
   <div id="loginArea">
@@ -19,127 +24,99 @@
     <div id="loginMsg" class="mensagem"></div>
   </div>
 
+<!-- Banner logo abaixo do login -->
+<div id="banner">
+  <h2>Confira nossas novidades!</h2>
+</div>
+
+<!-- Contato discreto logo abaixo do banner -->
+<div id="contato-discreto">
+  <p>📞 WhatsApp: (21) 98152-0719</p>
+  <p>💡 Caso tenha interesse em algum produto, anote o número do card e entre em contato comigo pelo WhatsApp.</p>
+</div>
+
+<!-- Filtros logo abaixo do contato -->
+<div id="filtros">
+  <select id="estadoFiltro">
+    <option value="">Todos</option>
+    <option value="novo">Novo</option>
+    <option value="seminovo">Seminovo</option>
+    <option value="usado">Usado</option>
+  </select>
+  <select id="qualidadeFiltro">
+    <option value="">Todas</option>
+    <option value="normal">Normal</option>
+    <option value="avariado">Avariado</option>
+    <option value="quebrado">Quebrado</option>
+  </select>
+  <button id="aplicarFiltros">Filtrar</button>
+</div>
+
+
   <!-- Painel Administrativo -->
   <div id="painel" style="display:none;">
-    <button id="logoutBtn">Sair</button>
     <h2>Painel Administrativo</h2>
+    <button id="logoutBtn">Sair</button>
 
-    <!-- Menu de Abas -->
-    <div class="tabs">
-      <button class="tablink active" onclick="abrirAba('produtos')">Produtos</button>
-      <button class="tablink" onclick="abrirAba('relatorios')">Relatórios</button>
-    </div>
+    <!-- Cadastro de Produto -->
+    <h3>Cadastrar Produto</h3>
+    <form id="productForm">
+      <input type="text" id="nome" placeholder="Nome" required>
+      <input type="number" id="quantidade" placeholder="Quantidade" required>
+      <select id="estado">
+        <option value="novo">Novo</option>
+        <option value="seminovo">Seminovo</option>
+        <option value="usado">Usado</option>
+      </select>
+      <input type="number" id="preco" placeholder="Preço" required>
+      <select id="qualidade">
+        <option value="normal">Normal</option>
+        <option value="avariado">Avariado</option>
+        <option value="quebrado">Quebrado</option>
+      </select>
+      <textarea id="descricao" placeholder="Descrição"></textarea>
+      <input type="file" id="foto">
+      <button type="submit">Salvar</button>
+    </form>
+    <div id="productMsg" class="mensagem"></div>
 
-    <!-- Aba Produtos -->
-    <div id="produtos" class="tabcontent" style="display:block;">
-      <h3>Cadastro de Produtos</h3>
-      <form id="productForm">
-        <input type="text" id="nome" placeholder="Nome" required>
-        <input type="number" id="quantidade" placeholder="Quantidade" required>
-        <input type="text" id="estado" placeholder="Estado" required>
-        <input type="number" id="preco" placeholder="Preço" required>
-        <input type="text" id="qualidade" placeholder="Qualidade" required>
-        <textarea id="descricao" placeholder="Descrição"></textarea>
-        <input type="file" id="foto" accept="image/*">
-        <button type="submit">Salvar</button>
-      </form>
-      <div id="productMsg" class="mensagem"></div>
+    <!-- Relatório de Produtos -->
+    <h3>Produtos Cadastrados</h3>
+    <table id="productTable">
+      <thead>
+        <tr>
+          <th>Card</th>
+          <th>Nome</th>
+          <th>Qtd</th>
+          <th>Estado</th>
+          <th>Preço</th>
+          <th>Qualidade</th>
+          <th>Atualizado</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-      <h3>Lista de Produtos</h3>
-      <table id="productTable">
-        <thead>
-          <tr>
-            <th>Card</th>
-            <th>Nome</th>
-            <th>Qtd</th>
-            <th>Estado</th>
-            <th>Preço</th>
-            <th>Qualidade</th>
-            <th>Atualizado</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-
-      <h3>Movimentação do Site</h3>
-      <form id="prazoForm">
-        <label for="diasVisivel">Prazo de visibilidade (dias):</label>
-        <input type="number" id="diasVisivel" min="1" required>
-        <button type="submit">Atualizar</button>
-      </form>
-      <p id="painelPrazo"></p>
-      <p id="prazoMsg" class="mensagem"></p>
-
-      <table id="movimentacaoTable">
-        <thead>
-          <tr>
-            <th>Produto</th>
-            <th>Status</th>
-            <th>Data de início</th>
-            <th>Data de remoção</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <!-- Aba Relatórios -->
-    <div id="relatorios" class="tabcontent" style="display:none;">
-      <h3>Resumo Mensal</h3>
-      <div id="resumoMensal">
-        <p id="vendidosMes">Vendidos: 0</p>
-        <p id="reservadosMes">Reservados: 0</p>
-      </div>
-
-      <h3>Gráfico Mensal</h3>
-      <canvas id="graficoMensal" width="400" height="200"></canvas>
-
-      <h3>Comparativo Mensal</h3>
-      <canvas id="graficoBarras" width="600" height="300"></canvas>
-
-      <h3>Comparativo Anual</h3>
-      <canvas id="graficoAnual" width="600" height="300"></canvas>
-
-      <h3>Exportação</h3>
-      <div id="exportarMes">
-        <label for="mesSelect">Selecione o mês:</label>
-        <input type="month" id="mesSelect" required>
-        <button id="exportarCSVmes">Exportar por Mês</button>
-        <button id="exportarCSV">Exportar Histórico Completo</button>
-      </div>
-
-      <div id="exportarAno">
-        <label for="anoSelect">Selecione o ano:</label>
-        <input type="number" id="anoSelect" min="2000" max="2100" required>
-        <button id="exportarCSVano">Exportar por Ano</button>
-      </div>
-
-      <div id="exportarMultiAno">
-        <button id="exportarCSVmultiAno">Exportar Consolidado Multi-Ano</button>
-      </div>
-    </div>
+    <!-- Banner Config -->
+    <h3>Configurar Banner</h3>
+    <form id="bannerForm">
+      <select id="frasePre"></select>
+      <input type="text" id="fraseCustom" placeholder="Frase personalizada">
+      <button type="submit">Atualizar Banner</button>
+    </form>
+    <div id="bannerMsg" class="mensagem"></div>
+    <p id="painelBanner"></p>
   </div>
 
-  <!-- Vitrine Pública -->
-  <h2>Vitrine</h2>
-  <div id="filtros">
-    <select id="estadoFiltro">
-      <option value="">Estado</option>
-      <option value="novo">Novo</option>
-      <option value="usado">Usado</option>
-    </select>
-    <select id="qualidadeFiltro">
-      <option value="">Qualidade</option>
-      <option value="alta">Alta</option>
-      <option value="media">Média</option>
-      <option value="baixa">Baixa</option>
-    </select>
-    <button id="aplicarFiltros">Aplicar Filtros</button>
-  </div>
-  <div id="vitrine" style="display:none;"></div>
+  <!-- Título da Vitrine -->
+  <h2 class="vitrine-titulo">Vitrine de Produtos</h2>
 
-  <!-- Script -->
+  <!-- Vitrine de Produtos -->
+  <div id="vitrine"></div>
+
   <script type="module" src="script.js"></script>
 </body>
 </html>
+
+
