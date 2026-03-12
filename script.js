@@ -33,10 +33,6 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     document.getElementById("painel").style.display = "block";
     carregarProdutos();
     atualizarBanner();
-    atualizarPrazo();
-    carregarMovimentacao();
-    carregarGraficoBarras();
-    carregarGraficoAnual();
   }
 });
 
@@ -189,18 +185,18 @@ async function carregarProdutos() {
         const id = btn.getAttribute("data-id");
         const { data } = await supabase.from("produtos").select("vendido").eq("id", id).single();
         const novoStatus = !data.vendido;
-        await supabase.from("produtos").update({ vendido: novoStatus, data_venda: novoStatus ? new Date().toISOString() : null }).eq("id", id);
+        await supabase.from("produtos").update({ vendido: novoStatus }).eq("id", id);
         mostrarMensagem("productMsg", novoStatus ? "Produto marcado como vendido!" : "Produto liberado!", "sucesso");
         carregarProdutos();
         atualizarVitrine();
-        carregarMovimentacao();
       });
     });
   }
 }
+carregarProdutos();
 
 // ----------------------
-// Vitrine Pública + Filtros
+// Vitrine Pública + Filtros (sem preço)
 // ----------------------
 async function atualizarVitrine() {
   const { data, error } = await supabase.from("produtos").select("*");
@@ -232,7 +228,7 @@ function renderizarVitrine(data) {
 }
 
 // ----------------------
-// Filtros (estado e qualidade)
+// Filtros (apenas estado e qualidade)
 // ----------------------
 document.getElementById("aplicarFiltros").addEventListener("click", async () => {
   const estado = document.getElementById("estadoFiltro").value;
@@ -250,140 +246,54 @@ document.getElementById("aplicarFiltros").addEventListener("click", async () => 
 });
 
 // ----------------------
-// Movimentação do Site + Prazo
+// Banner dinâmico
 // ----------------------
-async function carregarMovimentacao() {
-  const { data: produtos } = await supabase.from("produtos").select("*");
-  const { data: config } = await supabase.from("config").select("*").eq("id", 1).single();
-  const diasVisivel = config?.dias_visivel_vendido || 7;
+const frasesPre = [
+  "Confira nossas novidades!",
+  "Peças únicas esperando por você!",
+  "Novidades fresquinhas no brechó!",
+  "Garimpe já sua próxima peça favorita!"
+];
 
-  const tbody = document.querySelector("#movimentacaoTable tbody");
-  tbody.innerHTML = "";
+const bannerDiv = document.getElementById("banner");
+const selectFrase = document.getElementById("frasePre");
 
-  produtos.forEach(p => {
-    if (p.reservado || p.vendido) {
-      let status = p.reservado ? "Reservado" : "Vendido";
-      let dataInicio = "";
-      let dataRemocao = "";
+frasesPre.forEach(f => {
+  const opt = document.createElement("option");
+  opt.value = f;
+  opt.textContent = f;
+  selectFrase.appendChild(opt);
+});
 
-      if (p.reservado && p.updated_at) {
-        dataInicio = new Date(p.updated_at).toLocaleString("pt-BR");
-      }
-
-      if (p.vendido && p.data_venda) {
-        const dataVenda = new Date(p.data_venda);
-        dataInicio = dataVenda.toLocaleString("pt-BR");
-        const dataExpira = new Date(dataVenda);
-        dataExpira.setDate(dataExpira.getDate() + diasVisivel);
-        dataRemocao = dataExpira.toLocaleString("pt-BR");
-      }
-
-      const row = `<tr>
-        <td>${p.nome}</td>
-        <td>${status}</td>
-        <td>${dataInicio}</td>
-        <td>${dataRemocao}</td>
-      </tr>`;
-      tbody.innerHTML += row;
-    }
-  });
-}
-
-async function atualizarPrazo() {
-  const { data } = await supabase.from("config").select("*").eq("id", 1).single();
-  if (data) {
-    document.getElementById("diasVisivel").value = data.dias_visivel_vendido || 7;
-    document.getElementById("painelPrazo").textContent = 
-      "Prazo atual: " + (data.dias_visivel_vendido || 7) + " dias";
+async function atualizarBanner() {
+  const { data, error } = await supabase.from("config").select("*").eq("id", 1).single();
+  if (!error && data) {
+    bannerDiv.querySelector("h2").textContent = data.texto;
+    document.getElementById("painelBanner").textContent = "Frase atual do banner: " + data.texto;
+  } else {
+    bannerDiv.querySelector("h2").textContent = frasesPre[0];
+    document.getElementById("painelBanner").textContent = "Nenhuma frase definida ainda.";
   }
 }
 
-document.getElementById("prazoForm").addEventListener("submit", async (e) => {
+document.getElementById("bannerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const dias = parseInt(document.getElementById("diasVisivel").value);
-  await supabase.from("config").upsert({ id: 1, dias_visivel_vendido: dias });
-  document.getElementById("prazoMsg").textContent = "Prazo atualizado com sucesso!";
-  atualizarPrazo();
-  carregarMovimentacao();
+  const selectFrase = document.getElementById("frasePre").value;
+  const fraseCustom = document.getElementById("fraseCustom").value.trim();
+  const texto = fraseCustom !== "" ? fraseCustom : selectFrase;
+
+  const { error } = await supabase.from("config").upsert({ id: 1, texto });
+  if (error) {
+    mostrarMensagem("bannerMsg", "Erro ao atualizar banner: " + error.message, "erro");
+  } else {
+    mostrarMensagem("bannerMsg", "Banner atualizado com sucesso!", "sucesso");
+    atualizarBanner();
+  }
 });
-
-// ----------------------
-// Exportações CSV
-// ----------------------
-function exportarMovimentacaoCSV() { /* ... já implementado */ }
-function exportarMovimentacaoPorMes() { /* ... já implementado */ }
-async function exportarMovimentacaoPorAno() { /* ... já implementado */ }
-async function exportarMovimentacaoMultiAno() { /* ... já implementado */ }
-
-// ----------------------
-// Resumo Mensal + Gráficos
-// ----------------------
-async function carregarResumoMensal(mesSelecionado) { /* ... já implementado */ }
-let graficoMensal;
-let graficoBarras;
-let graficoAnual;
-
-async function carregarGraficoBarras() { /* ... já implementado */ }
-async function carregarGraficoAnual() { /* ... já implementado */ }
-
-// ----------------------
-// Eventos dos Botões
-// ----------------------
-document.getElementById("exportarCSV").addEventListener("click", exportarMovimentacaoCSV);
-document.getElementById("exportarCSVmes").addEventListener("click", exportarMovimentacaoPorMes);
-document.getElementById("exportarCSVano").addEventListener("click", exportarMovimentacaoPorAno);
-document.getElementById("exportarCSVmultiAno").addEventListener("click", exportarMovimentacaoMultiAno);
 
 // ----------------------
 // Inicialização
 // ----------------------
-
-// Carrega produtos para o painel administrativo
-carregarProdutos();
-
-// Atualiza vitrine pública
 atualizarVitrine();
-
-// Atualiza prazo configurado para produtos vendidos
-atualizarPrazo();
-
-// Carrega movimentação (reservados e vendidos)
-carregarMovimentacao();
-
-// Carrega gráficos comparativos
-carregarGraficoBarras();
-carregarGraficoAnual();
-
-// Eventos dos botões de exportação
-document.getElementById("exportarCSV").addEventListener("click", exportarMovimentacaoCSV);
-document.getElementById("exportarCSVmes").addEventListener("click", exportarMovimentacaoPorMes);
-document.getElementById("exportarCSVano").addEventListener("click", exportarMovimentacaoPorAno);
-document.getElementById("exportarCSVmultiAno").addEventListener("click", exportarMovimentacaoMultiAno);
-
-// Atualiza resumo mensal quando selecionar mês
-document.getElementById("mesSelect").addEventListener("change", (e) => {
-  carregarResumoMensal(e.target.value);
-});
-
-// ----------------------
-// Funções de Exportação CSV
-// ----------------------
-document.getElementById("exportarCSV").addEventListener("click", exportarMovimentacaoCSV);
-document.getElementById("exportarCSVmes").addEventListener("click", exportarMovimentacaoPorMes);
-document.getElementById("exportarCSVano").addEventListener("click", exportarMovimentacaoPorAno);
-document.getElementById("exportarCSVmultiAno").addEventListener("click", exportarMovimentacaoMultiAno);
-
-// ----------------------
-// Inicialização Final
-// ----------------------
-
-// Carrega dados iniciais ao abrir o painel
-(async () => {
-  await carregarProdutos();        // Produtos no painel administrativo
-  await atualizarVitrine();        // Vitrine pública
-  await atualizarPrazo();          // Prazo configurado
-  await carregarMovimentacao();    // Movimentação (reservados/vendidos)
-  await carregarGraficoBarras();   // Gráfico mensal comparativo
-  await carregarGraficoAnual();    // Gráfico anual comparativo
-})();
+atualizarBanner();
 
